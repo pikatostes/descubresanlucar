@@ -4,8 +4,12 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { useState } from 'react';
 
 export default function Register() {
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         email: '',
@@ -35,7 +39,7 @@ export default function Register() {
                         value={data.name}
                         className="mt-1 block w-full"
                         autoComplete="name"
-                        isFocused={true}
+                        isFocused
                         onChange={(e) => setData('name', e.target.value)}
                         required
                     />
@@ -60,41 +64,59 @@ export default function Register() {
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
+                {/* PASSWORD */}
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
 
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
-                    />
+                    <div className="relative">
+                        <TextInput
+                            id="password"
+                            type={showPassword ? 'text' : 'password'}
+                            name="password"
+                            value={data.password}
+                            className="mt-1 block w-full pr-10"
+                            autoComplete="new-password"
+                            onChange={(e) => setData('password', e.target.value)}
+                            required
+                        />
+
+                        <TogglePasswordButton
+                            visible={showPassword}
+                            onClick={() => setShowPassword(!showPassword)}
+                        />
+                    </div>
 
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
+                {/* CONFIRM PASSWORD */}
                 <div className="mt-4">
                     <InputLabel
                         htmlFor="password_confirmation"
                         value="Confirm Password"
                     />
 
-                    <TextInput
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                        required
-                    />
+                    <div className="relative">
+                        <TextInput
+                            id="password_confirmation"
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            name="password_confirmation"
+                            value={data.password_confirmation}
+                            className="mt-1 block w-full pr-10"
+                            autoComplete="new-password"
+                            onChange={(e) =>
+                                setData('password_confirmation', e.target.value)
+                            }
+                            required
+                        />
+
+                        <TogglePasswordButton
+                            visible={showConfirmPassword}
+                            onClick={() =>
+                                setShowConfirmPassword(!showConfirmPassword)
+                            }
+                        />
+                    </div>
 
                     <InputError
                         message={errors.password_confirmation}
@@ -102,10 +124,10 @@ export default function Register() {
                     />
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
+                <div className="mt-6 flex items-center justify-end">
                     <Link
                         href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="text-sm text-gray-600 underline hover:text-gray-900"
                     >
                         Already registered?
                     </Link>
@@ -116,5 +138,66 @@ export default function Register() {
                 </div>
             </form>
         </GuestLayout>
+    );
+}
+
+/* ---------- COMPONENTE BOTÓN MOSTRAR CONTRASEÑA ---------- */
+
+function TogglePasswordButton({ visible, onClick }) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+        >
+            {visible ? (
+                <EyeOffIcon />
+            ) : (
+                <EyeIcon />
+            )}
+        </button>
+    );
+}
+
+function EyeIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+        >
+            <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+            />
+            <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+            />
+        </svg>
+    );
+}
+
+function EyeOffIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+        >
+            <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498M6.228 6.228 3 3m3.228 3.228 12.544 12.544M21 21"
+            />
+        </svg>
     );
 }
