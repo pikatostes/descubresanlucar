@@ -1,4 +1,4 @@
-import { CATEGORIES } from '@/data/placesData';
+import { CATEGORIES } from '../data/Placesdata';
 
 export default function CategoryMenu({ activeCategory, onCategoryChange }) {
     return (

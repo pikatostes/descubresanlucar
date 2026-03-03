@@ -12,11 +12,11 @@ export default function HeroSection({ onSearch, searchValue, onSearchChange }) {
                 <h1 className="hero-title">
                     Descubre los mejores
                     <span className="hero-accent"> lugares</span>
-                    <br />de tu ciudad
+                    <br />de Sanlúcar de Barrameda
                 </h1>
                 <p className="hero-subtitle">
                     Restaurantes, bares, hoteles y mucho más. Encuentra y apoya
-                    los negocios locales que hacen única tu ciudad.
+                    los negocios locales que hacen única a Sanlúcar.
                 </p>
 
                 {/* Buscador */}

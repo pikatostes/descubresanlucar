@@ -8,7 +8,7 @@ export default function Navbar({ auth }) {
                 <Link href="/" className="navbar-logo">
                     <span className="logo-icon">📍</span>
                     <span className="logo-text">
-                        Descubre<strong>Ciudad</strong>
+                        Descubre<strong>Sanlúcar</strong>
                     </span>
                 </Link>
 
@@ -27,11 +27,11 @@ export default function Navbar({ auth }) {
                         </Link>
                     ) : (
                         <>
-                            <Link href={route('login')} className="btn-ghost">
-                                Entrar
+                            <Link href={route('login')} className="btn-primary">
+                                Iniciar Sesión
                             </Link>
-                            <Link href={route('register')} className="btn-primary">
-                                Anunciar mi negocio
+                            <Link href={route('register')} className="btn-secondary">
+                                Registrarse
                             </Link>
                         </>
                     )}

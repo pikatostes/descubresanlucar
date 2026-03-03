@@ -778,6 +778,151 @@ body {
     .btn-ghost { display: none; }
 }
 
+/* ── Footer ─────────────────────────────────────────────────── */
+.site-footer {
+    background: linear-gradient(180deg, #1E0F08 0%, #2C1810 100%);
+    color: rgba(250, 243, 232, 0.7);
+    font-family: var(--font-body);
+}
+
+.footer-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 64px 24px 40px;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 60px;
+    align-items: start;
+}
+
+/* Brand / logo */
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.footer-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-size: 1.15rem;
+}
+
+.footer-logo-text {
+    font-family: var(--font-display);
+    color: var(--cream);
+    letter-spacing: -0.02em;
+}
+.footer-logo-text strong { color: var(--ochre-light); }
+
+.footer-tagline {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: rgba(250, 243, 232, 0.5);
+    max-width: 220px;
+}
+
+/* Secciones */
+.footer-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 32px;
+}
+
+.footer-section-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ochre-light);
+    margin-bottom: 16px;
+}
+
+.footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-link {
+    font-size: 0.875rem;
+    color: rgba(250, 243, 232, 0.6);
+    text-decoration: none;
+    transition: color var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.footer-link::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--terracotta);
+    opacity: 0;
+    transition: opacity var(--transition);
+    flex-shrink: 0;
+}
+.footer-link:hover {
+    color: var(--cream);
+}
+.footer-link:hover::before {
+    opacity: 1;
+}
+
+.footer-link-plain {
+    font-size: 0.875rem;
+    color: rgba(250, 243, 232, 0.4);
+}
+
+/* Bottom bar */
+.footer-bottom {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 20px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.78rem;
+    color: rgba(250, 243, 232, 0.35);
+}
+
+.footer-bottom-links {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-bottom-link {
+    font-size: 0.78rem;
+    color: rgba(250, 243, 232, 0.35);
+    text-decoration: none;
+    transition: color var(--transition);
+}
+.footer-bottom-link:hover { color: var(--ochre-light); }
+
+.footer-dot { opacity: 0.3; }
+
+@media (max-width: 768px) {
+    .footer-inner {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 48px 24px 32px;
+    }
+    .footer-tagline { max-width: 100%; }
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
 /* ── Animaciones suaves de entrada ──────────────────────────── */
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }

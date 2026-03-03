@@ -2,26 +2,36 @@ import { Link } from '@inertiajs/react';
 
 export default function Footer({ sections = [] }) {
     return (
-        <footer className="bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300">
-            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
+        <footer className="site-footer">
+            <div className="footer-inner">
+                {/* Logo y descripción */}
+                <div className="footer-brand">
+                    <Link href="/" className="footer-logo">
+                        <span>📍</span>
+                        <span className="footer-logo-text">
+                            Descubre<strong>Sanlúcar</strong>
+                        </span>
+                    </Link>
+                    <p className="footer-tagline">
+                        Tu guía local de confianza. Descubre los mejores
+                        establecimientos y apoya los negocios de tu ciudad.
+                    </p>
+                </div>
+
+                {/* Secciones de links */}
+                <div className="footer-sections">
                     {sections.map((section, index) => (
-                        <div key={index}>
-                            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-900 dark:text-white">
-                                {section.title}
-                            </h4>
-                            <ul className="space-y-2">
+                        <div key={index} className="footer-section">
+                            <h4 className="footer-section-title">{section.title}</h4>
+                            <ul className="footer-links">
                                 {section.links.map((link, idx) => (
                                     <li key={idx}>
                                         {link.href ? (
-                                            <Link
-                                                href={link.href}
-                                                className="text-sm hover:underline hover:text-gray-900 dark:hover:text-white"
-                                            >
+                                            <Link href={link.href} className="footer-link">
                                                 {link.label}
                                             </Link>
                                         ) : (
-                                            <span className="text-sm">{link.label}</span>
+                                            <span className="footer-link-plain">{link.label}</span>
                                         )}
                                     </li>
                                 ))}
@@ -29,9 +39,17 @@ export default function Footer({ sections = [] }) {
                         </div>
                     ))}
                 </div>
+            </div>
 
-                <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-4 text-center text-sm">
-                    &copy; {new Date().getFullYear()} Your Company. All rights reserved.
+            {/* Bottom bar */}
+            <div className="footer-bottom">
+                <span>© {new Date().getFullYear()} DescubreSanlúcar. Todos los derechos reservados.</span>
+                <div className="footer-bottom-links">
+                    <Link href="/privacidad" className="footer-bottom-link">Privacidad</Link>
+                    <span className="footer-dot">·</span>
+                    <Link href="/terminos" className="footer-bottom-link">Términos</Link>
+                    <span className="footer-dot">·</span>
+                    <Link href="/contacto" className="footer-bottom-link">Contacto</Link>
                 </div>
             </div>
         </footer>

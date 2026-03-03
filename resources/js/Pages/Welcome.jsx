@@ -30,7 +30,7 @@ export default function Welcome({ auth, places = MOCK_PLACES }) {
 
     return (
         <>
-            <Head title="Descubre Ciudad - Guía de lugares de interés" />
+            <Head title="DescubreSanlúcar - Guía de lugares de interés" />
 
             <div className="page-root">
                 <Navbar auth={auth} />
