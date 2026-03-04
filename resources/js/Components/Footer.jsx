@@ -2,7 +2,7 @@ import { Link } from '@inertiajs/react';
 
 export default function Footer({ sections = [] }) {
     return (
-        <footer className="site-footer">
+        <footer className="site-footer height-100">
             <div className="footer-inner">
                 {/* Logo y descripción */}
                 <div className="footer-brand">

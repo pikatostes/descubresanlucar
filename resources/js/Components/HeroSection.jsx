@@ -1,7 +1,15 @@
+import bgImage from '../../assets/images/sanlucar.webp';
+import '../../css/HeroSection.css';
+
 export default function HeroSection({ onSearch, searchValue, onSearchChange }) {
     return (
         <section className="hero">
-            <div className="hero-bg-shapes">
+            <div className="hero-bg-shapes" style={{
+                backgroundImage: `url(${bgImage})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat"
+            }}>
                 <div className="shape shape-1" />
                 <div className="shape shape-2" />
                 <div className="shape shape-3" />

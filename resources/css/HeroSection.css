@@ -1,0 +1,38 @@
+.hero-title {
+    color: white;
+
+    /* Reborde negro */
+    text-shadow:
+        -1px -1px 0 #000,
+         1px -1px 0 #000,
+        -1px  1px 0 #000,
+         1px  1px 0 #000;
+}
+
+.hero-eyebrow {
+    color: white;
+    text-shadow:
+        -1px -1px 0 #000,
+         1px -1px 0 #000,
+        -1px  1px 0 #000,
+         1px  1px 0 #000;
+}
+
+.hero-subtitle {
+    color: white;
+
+    text-shadow:
+        -0.1px -0.1px 0 #000,
+         0.1px -0.1px 0 #000,
+        -0.1px  0.1px 0 #000,
+         0.1px  0.1px 0 #000;
+}
+
+/* Quitamos el reborde en hero-accent */
+.hero-accent {
+    text-shadow:
+        -1px -1px 0 #FFF,
+         1px -1px 0 #FFF,
+        -1px  1px 0 #FFF,
+         1px  1px 0 #FFF;
+}
