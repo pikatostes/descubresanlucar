@@ -7,18 +7,10 @@ import CategoryMenu from '../Components/CategoryMenu';
 import FilterBar from '../Components/FilterBar';
 import PlaceCard from '../Components/PlaceCard';
 import OwnerCTA from '../Components/OwnerCTA';
-import { MOCK_PLACES } from '../data/Placesdata';
 import { filterAndSortPlaces } from '../utils/FilterUtils';
 import '../../css/Welcome.css';
 
-/**
- * Welcome - Página de inicio
- *
- * Props (via Inertia desde Laravel):
- * @param {Object} auth - Usuario autenticado
- * @param {Array}  places - Establecimientos desde la BD (cuando exista el controlador)
- */
-export default function Welcome({ auth, places = MOCK_PLACES }) {
+export default function Welcome({ auth, places = [], categories = [] }) {
     const [activeCategory, setActiveCategory] = useState('all');
     const [sortBy, setSortBy] = useState('relevance');
     const [search, setSearch] = useState('');
@@ -41,13 +33,12 @@ export default function Welcome({ auth, places = MOCK_PLACES }) {
                     onSearch={setSearch}
                 />
 
-                {/* Menú de categorías */}
                 <CategoryMenu
+                    categories={categories}
                     activeCategory={activeCategory}
                     onCategoryChange={setActiveCategory}
                 />
 
-                {/* Listado principal */}
                 <section className="places-section">
                     <div className="container">
                         <FilterBar
@@ -82,7 +73,6 @@ export default function Welcome({ auth, places = MOCK_PLACES }) {
                     </div>
                 </section>
 
-                {/* CTA propietarios */}
                 <OwnerCTA />
 
                 <Footer

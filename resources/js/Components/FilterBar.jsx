@@ -1,4 +1,9 @@
-import { SORT_OPTIONS } from '@/data/placesData';
+const SORT_OPTIONS = [
+    { value: 'relevance', label: 'Más relevantes' },
+    { value: 'name_asc',  label: 'Nombre A-Z' },
+    { value: 'name_desc', label: 'Nombre Z-A' },
+    { value: 'newest',    label: 'Más recientes' },
+];
 
 export default function FilterBar({ sortBy, onSortChange, totalResults, activeCategory }) {
     return (

@@ -1,10 +1,13 @@
-import { CATEGORIES } from '../data/Placesdata';
+export default function CategoryMenu({ categories = [], activeCategory, onCategoryChange }) {
+    const allCategories = [
+        { id: 'all', slug: 'all', label: 'Todos', icon: '🏙️' },
+        ...categories.map(cat => ({ ...cat, id: cat.slug })),
+    ];
 
-export default function CategoryMenu({ activeCategory, onCategoryChange }) {
     return (
         <div className="category-menu">
             <div className="category-menu-inner">
-                {CATEGORIES.map((cat) => (
+                {allCategories.map((cat) => (
                     <button
                         key={cat.id}
                         className={`category-pill ${activeCategory === cat.id ? 'active' : ''}`}
