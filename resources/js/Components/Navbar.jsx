@@ -1,9 +1,11 @@
-import { Link } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { Link, usePage } from '@inertiajs/react';
+import { useState, useEffect, useRef } from 'react';
 import '../../css/Navbar.css';
 
 export default function Navbar({ auth }) {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
     useEffect(() => {
         const handleResize = () => {
@@ -17,6 +19,17 @@ export default function Navbar({ auth }) {
         document.body.style.overflow = menuOpen ? 'hidden' : '';
         return () => { document.body.style.overflow = ''; };
     }, [menuOpen]);
+
+    // Cierra el dropdown de usuario al hacer clic fuera
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                setUserDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     return (
         <nav className="navbar relative">
@@ -34,14 +47,61 @@ export default function Navbar({ auth }) {
                     <Link href="/lugares" className="nav-link">Explorar</Link>
                     <Link href="/categorias" className="nav-link">Categorías</Link>
                     <Link href="/mapa" className="nav-link">Mapa</Link>
+                    {auth?.user && (
+                        <Link
+                            href={route('dashboard')}
+                            className={`nav-link${route().current('dashboard') ? ' active' : ''}`}
+                        >
+                            Dashboard
+                        </Link>
+                    )}
                 </div>
 
                 {/* Auth — oculto en móvil */}
                 <div className="nav-auth-group hidden md:flex">
                     {auth?.user ? (
-                        <Link href={route('dashboard')} className="btn-primary">
-                            Mi Panel
-                        </Link>
+                        <div className="relative" ref={dropdownRef}>
+                            <button
+                                type="button"
+                                className="btn-primary inline-flex items-center gap-1"
+                                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                            >
+                                {auth.user.name}
+                                <svg
+                                    className={`h-4 w-4 transition-transform duration-150 ${userDropdownOpen ? 'rotate-180' : ''}`}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                >
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                        clipRule="evenodd"
+                                    />
+                                </svg>
+                            </button>
+
+                            {userDropdownOpen && (
+                                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white border border-gray-100 py-1 z-50">
+                                    <Link
+                                        href={route('profile.edit')}
+                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                        onClick={() => setUserDropdownOpen(false)}
+                                    >
+                                        Perfil
+                                    </Link>
+                                    <Link
+                                        href={route('logout')}
+                                        method="post"
+                                        as="button"
+                                        className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                        onClick={() => setUserDropdownOpen(false)}
+                                    >
+                                        Cerrar Sesión
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
                     ) : (
                         <>
                             <Link href={route('login')} className="btn-primary">
@@ -81,7 +141,7 @@ export default function Navbar({ auth }) {
             </div>
 
             {/* Menú móvil desplegable */}
-            <div className={`md:hidden absolute top-full left-0 w-full z-50 shadow-lg bg-white overflow-hidden transition-all duration-300 ease-in-out ${menuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div className={`md:hidden absolute top-full left-0 w-full z-50 shadow-lg bg-white overflow-hidden transition-all duration-300 ease-in-out ${menuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'}`}>
                 <div className="flex flex-col gap-2 px-4 pb-4 pt-2">
                     <Link href="/lugares" className="nav-link py-2 border-b border-gray-100" onClick={() => setMenuOpen(false)}>
                         Explorar
@@ -93,11 +153,39 @@ export default function Navbar({ auth }) {
                         Mapa
                     </Link>
 
+                    {auth?.user && (
+                        <>
+                            <Link
+                                href={route('dashboard')}
+                                className="nav-link py-2 border-b border-gray-100"
+                                onClick={() => setMenuOpen(false)}
+                            >
+                                Dashboard
+                            </Link>
+                            <Link
+                                href={route('profile.edit')}
+                                className="nav-link py-2 border-b border-gray-100"
+                                onClick={() => setMenuOpen(false)}
+                            >
+                                Perfil
+                            </Link>
+                        </>
+                    )}
+
                     <div className="flex flex-col gap-2 pt-2">
                         {auth?.user ? (
-                            <Link href={route('dashboard')} className="btn-primary text-center" onClick={() => setMenuOpen(false)}>
-                                Mi Panel
-                            </Link>
+                            <>
+                                <div className="text-sm text-gray-500 px-1">{auth.user.email}</div>
+                                <Link
+                                    href={route('logout')}
+                                    method="post"
+                                    as="button"
+                                    className="btn-secondary text-center"
+                                    onClick={() => setMenuOpen(false)}
+                                >
+                                    Cerrar Sesión
+                                </Link>
+                            </>
                         ) : (
                             <>
                                 <Link href={route('login')} className="btn-primary text-center" onClick={() => setMenuOpen(false)}>

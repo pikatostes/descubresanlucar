@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -8,6 +9,8 @@ use Inertia\Inertia;
 use App\Http\Controllers\WelcomeController;
 
 Route::get('/', [WelcomeController::class, 'index']);
+
+Route::get('/lugares/{place}', [PlaceController::class, 'show'])->name('places.show');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
