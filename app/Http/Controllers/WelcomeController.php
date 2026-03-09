@@ -13,12 +13,42 @@ class WelcomeController extends Controller
     public function index()
     {
         return Inertia::render('Welcome', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
+            'canLogin'       => Route::has('login'),
+            'canRegister'    => Route::has('register'),
             'laravelVersion' => Application::VERSION,
-            'phpVersion' => PHP_VERSION,
-            'places' => Places::with('category')->get(),
-            'categories' => Category::all(),
+            'phpVersion'     => PHP_VERSION,
+
+            'places' => Places::with(['category', 'tags'])->get()->map(fn($place) => [
+                'id'          => $place->id,
+                'name'        => $place->name,
+                'slug'        => $place->slug,
+                'description' => $place->description,
+                'address'     => $place->address,
+                'image'       => $place->image,
+                'rating'      => $place->rating,
+                'featured'    => $place->featured,
+                // category sigue siendo objeto { slug, label, icon } — compatible con FilterUtils
+                'category'    => $place->category ? [
+                    'slug'  => $place->category->slug,
+                    'label' => $place->category->label,
+                    'icon'  => $place->category->icon,
+                ] : null,
+                // tags como array de slugs para filtrado rápido en JS
+                'tags'        => $place->tags->pluck('slug')->toArray(),
+            ]),
+
+            'categories' => Category::with('tags')->get()->map(fn($cat) => [
+                'id'    => $cat->id,
+                'slug'  => $cat->slug,
+                'label' => $cat->label,
+                'icon'  => $cat->icon,
+                // etiquetas anidadas para el desplegable
+                'tags'  => $cat->tags->map(fn($tag) => [
+                    'id'    => $tag->id,
+                    'slug'  => $tag->slug,
+                    'label' => $tag->name,
+                ])->values(),
+            ]),
         ]);
     }
 }

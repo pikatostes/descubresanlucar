@@ -12,12 +12,19 @@ import '../../css/Welcome.css';
 
 export default function Welcome({ auth, places = [], categories = [] }) {
     const [activeCategory, setActiveCategory] = useState('all');
-    const [sortBy, setSortBy] = useState('relevance');
-    const [search, setSearch] = useState('');
+    const [activeTag, setActiveTag]           = useState(null);
+    const [sortBy, setSortBy]                 = useState('relevance');
+    const [search, setSearch]                 = useState('');
+
+    // Al cambiar de categoría limpiar la etiqueta activa
+    function handleCategoryChange(slug) {
+        if (slug !== activeCategory) setActiveTag(null);
+        setActiveCategory(slug);
+    }
 
     const filteredPlaces = useMemo(
-        () => filterAndSortPlaces(places, activeCategory, sortBy, search),
-        [places, activeCategory, sortBy, search]
+        () => filterAndSortPlaces(places, activeCategory, activeTag, sortBy, search),
+        [places, activeCategory, activeTag, sortBy, search]
     );
 
     return (
@@ -36,7 +43,9 @@ export default function Welcome({ auth, places = [], categories = [] }) {
                 <CategoryMenu
                     categories={categories}
                     activeCategory={activeCategory}
-                    onCategoryChange={setActiveCategory}
+                    activeTag={activeTag}
+                    onCategoryChange={handleCategoryChange}
+                    onTagChange={setActiveTag}
                 />
 
                 <section className="places-section">
@@ -46,6 +55,8 @@ export default function Welcome({ auth, places = [], categories = [] }) {
                             onSortChange={setSortBy}
                             totalResults={filteredPlaces.length}
                             activeCategory={activeCategory}
+                            activeTag={activeTag}
+                            onClearTag={() => setActiveTag(null)}
                         />
 
                         {filteredPlaces.length > 0 ? (
@@ -64,6 +75,7 @@ export default function Welcome({ auth, places = [], categories = [] }) {
                                     onClick={() => {
                                         setSearch('');
                                         setActiveCategory('all');
+                                        setActiveTag(null);
                                     }}
                                 >
                                     Ver todos los lugares

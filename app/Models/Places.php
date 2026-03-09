@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Places extends Model
@@ -18,15 +20,20 @@ class Places extends Model
         'phone',
         'hours',
         'image',
-        'tags',
+        // 'tags' eliminado: ya no es columna JSON, ahora es relación pivot
     ];
 
-    protected $casts = [
-        'tags' => 'array',
-    ];
-
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Etiquetas via tabla pivot place_tag.
+     * Nombres de FK explícitos para evitar ambigüedad.
+     */
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'place_tag', 'place_id', 'tag_id');
     }
 }
