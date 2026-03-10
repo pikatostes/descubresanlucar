@@ -1,119 +1,121 @@
-/* ============================================================
-   Etiquetas / Tags — añadir a Welcome.css
-   Compatible con las clases .category-menu, .category-pill
-   ya existentes en tu proyecto.
-   ============================================================ */
-
-/* El item es el wrapper relativo que contiene el botón + dropdown */
-.category-menu-inner {
-    display: flex;
-    position: relative;
-    z-index: 2000;
-    align-items: flex-start; /* alinear desde arriba para que el dropdown no desplace otros botones */
-    gap: 0.5rem;
-    flex-wrap: nowrap;
-}
+/* ═══════════════════════════════════════════
+   CATEGORY MENU
+═══════════════════════════════════════════ */
 
 .category-menu {
-    position: relative;
-    z-index: 2000;
+    overflow: visible !important;
+}
+
+.category-menu-inner {
+    overflow: visible !important;
 }
 
 .category-menu__item {
     position: relative;
-    flex-shrink: 0;
+    overflow: visible !important;
 }
 
-/* Chevron dentro del pill */
-.cat-chevron {
-    font-size: 0.7rem;
-    margin-left: 0.2rem;
-    display: inline-block;
-    transition: transform 0.2s ease;
-    line-height: 1;
-}
-.cat-chevron--open {
-    transform: rotate(180deg);
-}
+/* ═══════════════════════════════════════════
+   TAG DROPDOWN — cálido, moderno, flotante
+═══════════════════════════════════════════ */
 
-/* ============================================================
-   Dropdown de etiquetas
-   ============================================================ */
 .tag-dropdown {
     position: absolute;
-    top: calc(100% + 6px);
-    left: 0;
-    z-index: 100;
-    min-width: 190px;
-    background: #fff;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 0.7rem 0.75rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    animation: tagDropdownIn 0.15s ease;
+    top: calc(100% + 10px);
+    left: 0;                        /* ✅ alineado al borde izquierdo del botón */
+    z-index: 9999;
+
+    background: #fffaf7;
+    border: 1px solid rgba(196, 82, 34, 0.15);
+    border-radius: 14px;
+    padding: 10px;
+    box-shadow:
+        0 8px 24px rgba(196, 82, 34, 0.12),
+        0 2px 6px rgba(0, 0, 0, 0.06);
+
+    min-width: 180px;
+    white-space: nowrap;
+
+    animation: dropdownFadeIn 0.18s ease forwards;
 }
 
-@keyframes tagDropdownIn {
+/* ✅ La animación NO usa transform con translateX para no interferir */
+@keyframes dropdownFadeIn {
     from {
         opacity: 0;
-        transform: translateY(-5px);
+        margin-top: -4px;
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        margin-top: 0px;
     }
 }
 
+/* Flechita decorativa hacia arriba */
+.tag-dropdown::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 20px;
+    width: 12px;
+    height: 12px;
+    background: #fffaf7;
+    border-left: 1px solid rgba(196, 82, 34, 0.15);
+    border-top: 1px solid rgba(196, 82, 34, 0.15);
+    rotate: 45deg;
+}
+
 .tag-dropdown__title {
-    font-size: 0.68rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: #9ca3af;
-    margin: 0 0 0.45rem;
+    display: none;
 }
 
 .tag-dropdown__list {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
+    flex-direction: column;
+    gap: 4px;
 }
 
-/* ============================================================
-   Chips de etiqueta
-   ============================================================ */
+/* ── Chips de etiqueta ── */
 .tag-chip {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 0.2rem;
-    padding: 0.28rem 0.7rem;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 9999px;
-    background: #f9fafb;
-    color: #374151;
-    font-size: 0.78rem;
+    justify-content: space-between;
+    gap: 6px;
+
+    width: 100%;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #5a3220;
+    font-size: 0.85rem;
     font-weight: 500;
+    letter-spacing: 0.01em;
     cursor: pointer;
-    white-space: nowrap;
+    text-align: left;
     transition:
-        border-color 0.15s,
-        background 0.15s,
-        color 0.15s;
-    line-height: 1.4;
+        background 0.15s ease,
+        color 0.15s ease;
 }
+
 .tag-chip:hover {
-    border-color: #6366f1;
-    color: #6366f1;
+    background: rgba(196, 82, 34, 0.08);
+    color: #c45222;
 }
+
 .tag-chip--active {
-    background: #eef2ff;
-    border-color: #6366f1;
-    color: #4f46e5;
+    background: linear-gradient(135deg, #c45222, #e0763a);
+    color: #fff;
     font-weight: 600;
 }
+
+.tag-chip--active:hover {
+    background: linear-gradient(135deg, #b04520, #c45222);
+    color: #fff;
+}
+
 .tag-chip__remove {
     font-size: 1rem;
     line-height: 1;
-    color: #6366f1;
-    margin-left: 0.05rem;
+    opacity: 0.75;
 }

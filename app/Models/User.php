@@ -44,4 +44,9 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     {
         return $this->hasRole('admin');
     }
+
+    public function places()
+    {
+        return $this->hasMany(Places::class);
+    }
 }

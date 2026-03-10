@@ -1,17 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-// import '../../css/tags.css'
+import '../../css/tags.css';
 
-/**
- * CategoryMenu
- *
- * Props nuevas respecto a la versión anterior:
- *  - activeTag: string | null
- *  - onTagChange: (slug: string | null) => void
- *
- * Cada categoría puede tener tags: [{ id, slug, label }]
- * Si una categoría tiene etiquetas, el botón muestra un chevron
- * y al pulsarlo se despliega el listado de etiquetas.
- */
 export default function CategoryMenu({
     categories = [],
     activeCategory,
@@ -22,15 +11,14 @@ export default function CategoryMenu({
     const [openCategory, setOpenCategory] = useState(null);
     const menuRef = useRef(null);
 
-    // Cerrar desplegable al hacer clic fuera del menú
     useEffect(() => {
         function handleOutside(e) {
             if (menuRef.current && !menuRef.current.contains(e.target)) {
                 setOpenCategory(null);
             }
         }
-        document.addEventListener('mousedown', handleOutside);
-        return () => document.removeEventListener('mousedown', handleOutside);
+        document.addEventListener('click', handleOutside);
+        return () => document.removeEventListener('click', handleOutside);
     }, []);
 
     const allCategories = [
@@ -46,14 +34,12 @@ export default function CategoryMenu({
             return;
         }
 
-        // Activar la categoría siempre
         onCategoryChange(slug);
 
         const cat = allCategories.find((c) => c.slug === slug);
         const hasTags = cat?.tags?.length > 0;
 
         if (hasTags) {
-            // Alternar el desplegable; si ya estaba abierto, lo cierra
             setOpenCategory((prev) => (prev === slug ? null : slug));
         } else {
             onTagChange(null);
@@ -63,7 +49,6 @@ export default function CategoryMenu({
 
     function handleTagClick(e, tagSlug) {
         e.stopPropagation();
-        // Pulsar la etiqueta activa la deselecciona
         onTagChange(activeTag === tagSlug ? null : tagSlug);
         setOpenCategory(null);
     }
@@ -96,10 +81,8 @@ export default function CategoryMenu({
                                 )}
                             </button>
 
-                            {/* Desplegable de etiquetas */}
                             {hasTags && isOpen && (
                                 <div className="tag-dropdown">
-                                    <p className="tag-dropdown__title">Filtrar por etiqueta</p>
                                     <div className="tag-dropdown__list">
                                         {cat.tags.map((tag) => (
                                             <button
