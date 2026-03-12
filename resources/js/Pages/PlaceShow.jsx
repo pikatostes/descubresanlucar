@@ -69,6 +69,37 @@ export default function PlaceShow({ auth, place }) {
                                 </section>
                             )}
 
+                            {/* Google Maps Embed */}
+                            {place.address && (
+                                <section className="place-section">
+                                    <h2 className="place-section__title">Ubicación</h2>
+                                    <div className="place-map-embed">
+                                        <iframe
+                                            width="100%"
+                                            height="350"
+                                            style={{ border: 0, borderRadius: '8px' }}
+                                            loading="lazy"
+                                            allowFullScreen
+                                            referrerPolicy="no-referrer-when-downgrade"
+                                            title={`Mapa de ${place.name}`}
+                                            src={`https://maps.google.com/maps?q=${encodeURIComponent(place.address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                                        />
+                                    </div>
+                                    <a
+                                        className="btn-map mt-3"
+                                        href={
+                                            place.latitude && place.longitude
+                                                ? `https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`
+                                                : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.address)}`
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Cómo llegar
+                                    </a>
+                                </section>
+                            )}
+
                             {place.tags && place.tags.length > 0 && (
                                 <section className="place-section">
                                     <h2 className="place-section__title">Etiquetas</h2>
@@ -136,17 +167,6 @@ export default function PlaceShow({ auth, place }) {
                                         <span className="info-icon">💶</span>
                                         <span className="price-range">{place.price_range}</span>
                                     </div>
-                                )}
-
-                                {place.latitude && place.longitude && (
-                                    <a
-                                        className="btn-map"
-                                        href={`https://maps.google.com/?q=${place.latitude},${place.longitude}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        Ver en Google Maps
-                                    </a>
                                 )}
                             </div>
                         </aside>
