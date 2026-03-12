@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TagResource\Pages;
 use App\Filament\Resources\TagResource\RelationManagers;
+use App\Models\Category;
 use App\Models\Tag;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -30,7 +31,8 @@ class TagResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('category_id')
-                    ->relationship('category', 'id')
+                    ->label('Category')
+                    ->options(Category::all()->pluck('label', 'id'))
                     ->required(),
             ]);
     }
@@ -43,8 +45,8 @@ class TagResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('category.id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('category.label')
+                    ->label('Category')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

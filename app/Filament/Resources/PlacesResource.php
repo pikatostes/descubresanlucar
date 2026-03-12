@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PlacesResource\Pages;
 use App\Filament\Resources\PlacesResource\RelationManagers;
+use App\Models\Category;
 use App\Models\Places;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -23,9 +24,10 @@ class PlacesResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('category_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('category_id')
+                    ->label('Category')
+                    ->options(Category::all()->pluck('label', 'id'))
+                    ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -52,8 +54,8 @@ class PlacesResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('category_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('category.label')
+                    ->label('Category')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
