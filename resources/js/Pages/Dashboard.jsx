@@ -1,8 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
-// ─── Icono de lápiz ───────────────────────────────────────────────────────────
 function IconEdit() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none"
@@ -13,7 +12,6 @@ function IconEdit() {
     );
 }
 
-// ─── Icono de negocio ─────────────────────────────────────────────────────────
 function IconStore() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none"
@@ -24,38 +22,50 @@ function IconStore() {
     );
 }
 
-// ─── Modal de edición ─────────────────────────────────────────────────────────
-function PlaceEditModal({ place, categories, onClose }) {
-    const { data, setData, put, processing, errors } = useForm({
-        name:        place.name        ?? '',
-        description: place.description ?? '',
-        address:     place.address     ?? '',
-        phone:       place.phone       ?? '',
-        hours:       place.hours       ?? '',
-        category_id: place.category_id ?? '',
+function IconPlus() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+    );
+}
+
+function PlaceEditModal({ place, categories, onClose, onSuccess }) {
+    const { data, setData, post, put, processing, errors } = useForm({
+        name: place?.name ?? '',
+        description: place?.description ?? '',
+        address: place?.address ?? '',
+        phone: place?.phone ?? '',
+        hours: place?.hours ?? '',
+        category_id: place?.category_id ?? '',
     });
 
     function handleSubmit(e) {
         e.preventDefault();
-        put(route('owner.places.update', place.id), {
-            onSuccess: () => onClose(),
-        });
+        if (place) {
+            put(route('owner.places.update', place.id), {
+                onSuccess: () => onClose(),
+            });
+        } else {
+            post(route('owner.places.store'), {
+                onSuccess: () => onClose(),
+            });
+        }
     }
 
     return (
-        // Backdrop
         <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
             onClick={(e) => e.target === e.currentTarget && onClose()}
         >
-            {/* Panel */}
             <div className="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
-
-                {/* Cabecera */}
                 <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-2 text-white">
                         <IconStore />
-                        <span className="font-semibold text-lg truncate max-w-xs">{place.name}</span>
+                        <span className="font-semibold text-lg truncate max-w-xs">
+                            {place ? `Editar ${place.name}` : 'Nuevo negocio'}
+                        </span>
                     </div>
                     <button
                         onClick={onClose}
@@ -66,10 +76,7 @@ function PlaceEditModal({ place, categories, onClose }) {
                     </button>
                 </div>
 
-                {/* Formulario */}
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
-
-                    {/* Nombre */}
                     <div>
                         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
                             Nombre del negocio
@@ -83,7 +90,6 @@ function PlaceEditModal({ place, categories, onClose }) {
                         {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                     </div>
 
-                    {/* Categoría */}
                     {categories && categories.length > 0 && (
                         <div>
                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
@@ -103,7 +109,6 @@ function PlaceEditModal({ place, categories, onClose }) {
                         </div>
                     )}
 
-                    {/* Descripción */}
                     <div>
                         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
                             Descripción
@@ -117,7 +122,6 @@ function PlaceEditModal({ place, categories, onClose }) {
                         {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
                     </div>
 
-                    {/* Dirección + Teléfono en fila */}
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
@@ -145,7 +149,6 @@ function PlaceEditModal({ place, categories, onClose }) {
                         </div>
                     </div>
 
-                    {/* Horario */}
                     <div>
                         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
                             Horario
@@ -160,7 +163,6 @@ function PlaceEditModal({ place, categories, onClose }) {
                         {errors.hours && <p className="text-red-500 text-xs mt-1">{errors.hours}</p>}
                     </div>
 
-                    {/* Botones */}
                     <div className="flex items-center justify-end gap-3 pt-2">
                         <button
                             type="button"
@@ -183,21 +185,17 @@ function PlaceEditModal({ place, categories, onClose }) {
     );
 }
 
-// ─── Tarjeta de negocio ───────────────────────────────────────────────────────
 function PlaceCard({ place, categories, onEdit }) {
     return (
         <div className="group relative bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-
-            {/* Imagen o placeholder */}
             <div className="h-32 bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center overflow-hidden">
                 {place.image
                     ? <img src={`/storage/${place.image}`} alt={place.name}
-                           className="w-full h-full object-cover" />
+                        className="w-full h-full object-cover" />
                     : <span className="text-4xl opacity-30"><IconStore /></span>
                 }
             </div>
 
-            {/* Info */}
             <div className="p-4">
                 <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
@@ -208,13 +206,19 @@ function PlaceCard({ place, categories, onEdit }) {
                             </span>
                         )}
                     </div>
-                    <button
-                        onClick={() => onEdit(place)}
-                        className="flex-shrink-0 flex items-center gap-1 text-xs text-gray-500 hover:text-amber-600 border border-gray-200 hover:border-amber-300 rounded-lg px-2 py-1.5 transition"
-                    >
-                        <IconEdit />
-                        Editar
-                    </button>
+                    {/* vertical col grid */}
+                    <div className="justify-self-end flex flex-col items-end gap-2 transition-opacity">
+                        <button
+                            onClick={() => onEdit(place)}
+                            className="flex-shrink-0 flex items-center gap-1 text-xs text-gray-500 hover:text-amber-600 border border-gray-200 hover:border-amber-300 rounded-lg px-2 py-1.5 transition"
+                        >
+                            <IconEdit />
+                            Editar
+                        </button>
+                        <Link href={`/lugares/${place.id}`} className="card-btn">
+                            Ver página
+                        </Link>
+                    </div>
                 </div>
 
                 {place.address && (
@@ -228,13 +232,11 @@ function PlaceCard({ place, categories, onEdit }) {
                 )}
             </div>
 
-            {/* Badge de estado */}
             {place.status && (
-                <div className={`absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
-                    place.status === 'active'
+                <div className={`absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full ${place.status === 'active'
                         ? 'bg-green-100 text-green-700'
                         : 'bg-gray-100 text-gray-500'
-                }`}>
+                    }`}>
                     {place.status === 'active' ? 'Activo' : place.status}
                 </div>
             )}
@@ -242,12 +244,13 @@ function PlaceCard({ place, categories, onEdit }) {
     );
 }
 
-// ─── Dashboard principal ──────────────────────────────────────────────────────
 export default function Dashboard({ ownerPlaces = [], categories = [] }) {
     const { auth } = usePage().props;
     const isOwner = auth.user?.role === 'owner';
+    const user = auth.user;
 
     const [editingPlace, setEditingPlace] = useState(null);
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     return (
         <AuthenticatedLayout
@@ -257,61 +260,102 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
                 </h2>
             }
         >
-            <Head title="Dashboard" />
+            <Head title="DescubreSanlúcar" />
 
             <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    {/* Grid 30% - 70% */}
+                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-                    {/* ── Bienvenida general ─────────────────────────────── */}
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            ¡Bienvenido, <strong>{auth.user.name}</strong>!
-                        </div>
-                    </div>
+                        {/* Columna izquierda (30%) - Perfil del usuario */}
+                        <div className="lg:col-span-1">
+                            <div className="bg-white shadow-sm rounded-xl overflow-hidden">
+                                <div className="p-6 text-center">
+                                    {/* Foto de perfil */}
+                                    <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-3xl font-bold overflow-hidden">
+                                        {user.profile_photo_url || user.name.charAt(0).toUpperCase()}
+                                    </div>
 
-                    {/* ── Panel de propietario ───────────────────────────── */}
-                    {isOwner && (
-                        <div className="bg-white shadow-sm sm:rounded-xl overflow-hidden">
+                                    <h3 className="font-semibold text-gray-800 text-lg">{user.name}</h3>
+                                    <p className="text-sm text-gray-500">{user.email}</p>
 
-                            {/* Cabecera del panel */}
-                            <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600">
-                                    <IconStore />
+                                    <div className="mt-4 inline-block px-3 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full capitalize">
+                                        {user.role || 'usuario'}
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 className="font-semibold text-gray-800">Mis negocios</h3>
-                                    <p className="text-xs text-gray-400">
-                                        {ownerPlaces.length === 0
-                                            ? 'No tienes negocios registrados'
-                                            : `${ownerPlaces.length} negocio${ownerPlaces.length > 1 ? 's' : ''} registrado${ownerPlaces.length > 1 ? 's' : ''}`
-                                        }
+
+                                <div className="border-t border-gray-100 px-6 py-4">
+                                    <p className="text-xs text-gray-400 text-center">
+                                        Miembro desde {new Date(user.created_at).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
                                     </p>
                                 </div>
                             </div>
-
-                            {/* Grid de negocios */}
-                            <div className="p-6">
-                                {ownerPlaces.length === 0 ? (
-                                    <div className="text-center py-12 text-gray-400">
-                                        <div className="text-5xl mb-3 opacity-20">🏪</div>
-                                        <p className="text-sm">Aún no tienes negocios asociados.</p>
-                                        <p className="text-xs mt-1">Contacta con el administrador para añadir uno.</p>
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {ownerPlaces.map(place => (
-                                            <PlaceCard
-                                                key={place.id}
-                                                place={place}
-                                                categories={categories}
-                                                onEdit={setEditingPlace}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
                         </div>
-                    )}
+
+                        {/* Columna derecha (70%) - Lugares del owner */}
+                        <div className="lg:col-span-4">
+                            {isOwner && (
+                                <div className="bg-white shadow-sm sm:rounded-xl overflow-hidden">
+                                    {/* Cabecera con botón de añadir */}
+                                    <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600">
+                                                <IconStore />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-semibold text-gray-800">Mis negocios</h3>
+                                                <p className="text-xs text-gray-400">
+                                                    {ownerPlaces.length === 0
+                                                        ? 'No tienes negocios registrados'
+                                                        : `${ownerPlaces.length} negocio${ownerPlaces.length > 1 ? 's' : ''} registrado${ownerPlaces.length > 1 ? 's' : ''}`
+                                                    }
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowCreateModal(true)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg transition"
+                                        >
+                                            <IconPlus />
+                                            Añadir negocio
+                                        </button>
+                                    </div>
+
+                                    {/* Grid de negocios */}
+                                    <div className="p-6">
+                                        {ownerPlaces.length === 0 ? (
+                                            <div className="text-center py-12 text-gray-400">
+                                                <div className="text-5xl mb-3 opacity-20">🏪</div>
+                                                <p className="text-sm">Aún no tienes negocios asociados.</p>
+                                                <p className="text-xs mt-1">Haz clic en "Añadir negocio" para crear el primero.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {ownerPlaces.map(place => (
+                                                    <PlaceCard
+                                                        key={place.id}
+                                                        place={place}
+                                                        categories={categories}
+                                                        onEdit={setEditingPlace}
+                                                    />
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {!isOwner && (
+                                <div className="bg-white shadow-sm rounded-xl overflow-hidden">
+                                    <div className="p-12 text-center text-gray-400">
+                                        <div className="text-5xl mb-3 opacity-20">🔐</div>
+                                        <p className="text-sm">No tienes permisos de propietario.</p>
+                                        <p className="text-xs mt-1">Contacta con el administrador para obtener acceso.</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -321,6 +365,15 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
                     place={editingPlace}
                     categories={categories}
                     onClose={() => setEditingPlace(null)}
+                />
+            )}
+
+            {/* Modal de creación */}
+            {showCreateModal && (
+                <PlaceEditModal
+                    place={null}
+                    categories={categories}
+                    onClose={() => setShowCreateModal(false)}
                 />
             )}
         </AuthenticatedLayout>

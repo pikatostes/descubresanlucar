@@ -21,6 +21,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Propietario: crear negocio
+    Route::post('/owner/places', [OwnerPlaceController::class, 'store'])
+        ->name('owner.places.store');
+    
     // Propietario: actualizar sus negocios
     Route::put('/owner/places/{place}', [OwnerPlaceController::class, 'update'])
         ->name('owner.places.update');
