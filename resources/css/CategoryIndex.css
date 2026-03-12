@@ -1,0 +1,124 @@
+/* =============================================
+   CategoryIndex.css — Página de categorías
+   ============================================= */
+
+.categories-page {
+    min-height: 60vh;
+    padding: 2rem 0 4rem;
+}
+
+.categories-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.categories-back {
+    display: inline-block;
+    color: var(--color-primary, #e8572a);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    transition: color 0.2s;
+}
+.categories-back:hover {
+    color: var(--color-primary-dark, #c94420);
+}
+
+.categories-title {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 800;
+    color: var(--color-text, #1a1a2e);
+    margin: 0 0 0.5rem;
+}
+
+.categories-subtitle {
+    font-size: 1.1rem;
+    color: var(--color-text-muted, #666);
+    margin: 0;
+}
+
+/* Grid */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.25rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Tarjeta de categoría */
+.category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid #eaeaea;
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border-color: var(--color-primary, #e8572a);
+}
+
+.category-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.category-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text, #1a1a2e);
+}
+
+/* Estado vacío */
+.categories-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--color-text-muted, #666);
+}
+
+.categories-empty .empty-icon {
+    display: block;
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+.categories-empty h3 {
+    font-size: 1.25rem;
+    color: var(--color-text, #333);
+    margin: 0 0 0.5rem;
+}
+
+.categories-empty p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+    .categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .category-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .category-icon {
+        font-size: 2rem;
+    }
+    
+    .category-label {
+        font-size: 1rem;
+    }
+}

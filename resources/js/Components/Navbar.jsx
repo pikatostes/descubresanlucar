@@ -44,7 +44,7 @@ export default function Navbar({ auth }) {
 
                 {/* Links centrales — ocultos en móvil */}
                 <div className="nav-links-group hidden md:flex">
-                    <Link href="/lugares" className="nav-link">Explorar</Link>
+                    <Link href="/explorar" className="nav-link">Explorar</Link>
                     <Link href="/categorias" className="nav-link">Categorías</Link>
                     <Link href="/mapa" className="nav-link">Mapa</Link>
                     {auth?.user && (

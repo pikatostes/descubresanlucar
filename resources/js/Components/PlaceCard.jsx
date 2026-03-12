@@ -26,7 +26,9 @@ export default function PlaceCard({ place }) {
                 {/* Tags */}
                 <div className="card-tags">
                     {place.tags?.slice(0, 3).map((tag) => (
-                        <span key={tag} className="tag">{tag}</span>
+                        <span key={tag.id || tag.name} className="tag">
+                            {typeof tag === 'object' ? tag.name : tag}
+                        </span>
                     ))}
                 </div>
 

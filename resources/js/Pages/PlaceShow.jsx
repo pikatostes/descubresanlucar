@@ -105,7 +105,9 @@ export default function PlaceShow({ auth, place }) {
                                     <h2 className="place-section__title">Etiquetas</h2>
                                     <div className="place-tags">
                                         {place.tags.map((tag) => (
-                                            <span key={tag} className="tag">{tag}</span>
+                                            <span key={tag.id || tag.name} className="tag">
+                                                {typeof tag === 'object' ? tag.name : tag}
+                                            </span>
                                         ))}
                                     </div>
                                 </section>
