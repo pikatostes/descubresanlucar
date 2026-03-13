@@ -783,6 +783,7 @@ body {
     background: linear-gradient(180deg, #1E0F08 0%, #2C1810 100%);
     color: rgba(250, 243, 232, 0.7);
     font-family: var(--font-body);
+    min-height: 90vh;
 }
 
 .footer-inner {

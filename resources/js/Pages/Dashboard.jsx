@@ -1,4 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import Footer from '@/Components/Footer';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -376,6 +377,8 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
                     onClose={() => setShowCreateModal(false)}
                 />
             )}
+
+            <Footer />
         </AuthenticatedLayout>
     );
 }
