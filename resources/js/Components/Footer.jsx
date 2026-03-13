@@ -1,9 +1,10 @@
 import { Link } from '@inertiajs/react';
+import '../../css/Footer.css';
 
 export default function Footer({ sections = [] }) {
     return (
-        <footer className="site-footer height-100">
-            <div className="footer-inner">
+        <footer className="site-footer height-100 d-flex flex-column justify-center">
+            <div className="footer-inner d-flex align-center">
                 {/* Logo y descripción */}
                 <div className="footer-brand">
                     <Link href="/" className="footer-logo">
