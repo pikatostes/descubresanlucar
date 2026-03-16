@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Footer from '@/Components/Footer';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import PlaceEditModal from '@/Components/PlaceEditModal';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 function IconEdit() {
@@ -32,161 +33,7 @@ function IconPlus() {
     );
 }
 
-function PlaceEditModal({ place, categories, onClose, onSuccess }) {
-    const { data, setData, post, put, processing, errors } = useForm({
-        name: place?.name ?? '',
-        description: place?.description ?? '',
-        address: place?.address ?? '',
-        phone: place?.phone ?? '',
-        hours: place?.hours ?? '',
-        category_id: place?.category_id ?? '',
-    });
-
-    function handleSubmit(e) {
-        e.preventDefault();
-        if (place) {
-            put(route('owner.places.update', place.id), {
-                onSuccess: () => onClose(),
-            });
-        } else {
-            post(route('owner.places.store'), {
-                onSuccess: () => onClose(),
-            });
-        }
-    }
-
-    return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            onClick={(e) => e.target === e.currentTarget && onClose()}
-        >
-            <div className="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
-                <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-white">
-                        <IconStore />
-                        <span className="font-semibold text-lg truncate max-w-xs">
-                            {place ? `Editar ${place.name}` : 'Nuevo negocio'}
-                        </span>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="text-white/80 hover:text-white transition-colors text-xl leading-none"
-                        aria-label="Cerrar"
-                    >
-                        ✕
-                    </button>
-                </div>
-
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                            Nombre del negocio
-                        </label>
-                        <input
-                            type="text"
-                            value={data.name}
-                            onChange={e => setData('name', e.target.value)}
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
-                        />
-                        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-                    </div>
-
-                    {categories && categories.length > 0 && (
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                                Categoría
-                            </label>
-                            <select
-                                value={data.category_id}
-                                onChange={e => setData('category_id', e.target.value)}
-                                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition bg-white"
-                            >
-                                <option value="">Sin categoría</option>
-                                {categories.map(cat => (
-                                    <option key={cat.id} value={cat.id}>{cat.label}</option>
-                                ))}
-                            </select>
-                            {errors.category_id && <p className="text-red-500 text-xs mt-1">{errors.category_id}</p>}
-                        </div>
-                    )}
-
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                            Descripción
-                        </label>
-                        <textarea
-                            value={data.description}
-                            onChange={e => setData('description', e.target.value)}
-                            rows={3}
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition resize-none"
-                        />
-                        {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                                Dirección
-                            </label>
-                            <input
-                                type="text"
-                                value={data.address}
-                                onChange={e => setData('address', e.target.value)}
-                                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
-                            />
-                            {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                                Teléfono
-                            </label>
-                            <input
-                                type="text"
-                                value={data.phone}
-                                onChange={e => setData('phone', e.target.value)}
-                                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
-                            />
-                            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                            Horario
-                        </label>
-                        <input
-                            type="text"
-                            value={data.hours}
-                            onChange={e => setData('hours', e.target.value)}
-                            placeholder="Ej: Lun–Vie 09:00–20:00"
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
-                        />
-                        {errors.hours && <p className="text-red-500 text-xs mt-1">{errors.hours}</p>}
-                    </div>
-
-                    <div className="flex items-center justify-end gap-3 pt-2">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                            {processing ? 'Guardando…' : 'Guardar cambios'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    );
-}
-
-function PlaceCard({ place, categories, onEdit }) {
+function PlaceCard({ place, onEdit }) {
     return (
         <div className="group relative bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
             <div className="h-32 bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center overflow-hidden">
@@ -207,7 +54,6 @@ function PlaceCard({ place, categories, onEdit }) {
                             </span>
                         )}
                     </div>
-                    {/* vertical col grid */}
                     <div className="justify-self-end flex flex-col items-end gap-2 transition-opacity">
                         <button
                             onClick={() => onEdit(place)}
@@ -234,10 +80,11 @@ function PlaceCard({ place, categories, onEdit }) {
             </div>
 
             {place.status && (
-                <div className={`absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full ${place.status === 'active'
+                <div className={`absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    place.status === 'active'
                         ? 'bg-green-100 text-green-700'
                         : 'bg-gray-100 text-gray-500'
-                    }`}>
+                }`}>
                     {place.status === 'active' ? 'Activo' : place.status}
                 </div>
             )}
@@ -250,7 +97,7 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
     const isOwner = auth.user?.role === 'owner';
     const user = auth.user;
 
-    const [editingPlace, setEditingPlace] = useState(null);
+    const [editingPlace, setEditingPlace]     = useState(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
 
     return (
@@ -265,26 +112,21 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {/* Grid 30% - 70% */}
                     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-                        {/* Columna izquierda (30%) - Perfil del usuario */}
+                        {/* Columna izquierda (30%) — Perfil del usuario */}
                         <div className="lg:col-span-1">
                             <div className="bg-white shadow-sm rounded-xl overflow-hidden">
                                 <div className="p-6 text-center">
-                                    {/* Foto de perfil */}
                                     <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-3xl font-bold overflow-hidden">
                                         {user.profile_photo_url || user.name.charAt(0).toUpperCase()}
                                     </div>
-
                                     <h3 className="font-semibold text-gray-800 text-lg">{user.name}</h3>
                                     <p className="text-sm text-gray-500">{user.email}</p>
-
                                     <div className="mt-4 inline-block px-3 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full capitalize">
                                         {user.role || 'usuario'}
                                     </div>
                                 </div>
-
                                 <div className="border-t border-gray-100 px-6 py-4">
                                     <p className="text-xs text-gray-400 text-center">
                                         Miembro desde {new Date(user.created_at).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
@@ -293,11 +135,10 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
                             </div>
                         </div>
 
-                        {/* Columna derecha (70%) - Lugares del owner */}
+                        {/* Columna derecha (70%) — Negocios del owner */}
                         <div className="lg:col-span-4">
                             {isOwner && (
                                 <div className="bg-white shadow-sm sm:rounded-xl overflow-hidden">
-                                    {/* Cabecera con botón de añadir */}
                                     <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600">
@@ -322,7 +163,6 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
                                         </button>
                                     </div>
 
-                                    {/* Grid de negocios */}
                                     <div className="p-6">
                                         {ownerPlaces.length === 0 ? (
                                             <div className="text-center py-12 text-gray-400">
@@ -336,7 +176,6 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
                                                     <PlaceCard
                                                         key={place.id}
                                                         place={place}
-                                                        categories={categories}
                                                         onEdit={setEditingPlace}
                                                     />
                                                 ))}
