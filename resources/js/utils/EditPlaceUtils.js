@@ -18,13 +18,13 @@ export function getInitialFormValues(place) {
         phone:       place?.phone       ?? '',
         hours:       place?.hours       ?? '',
         category_id: place?.category_id ?? '',
+        image:       null, // File object — nunca se pre-pobla desde el servidor
     };
 }
 
 /**
  * Devuelve la función de envío del formulario (submit handler).
- * Encapsula la lógica de decidir entre PUT (editar) y POST (crear),
- * así como la llamada a onClose tras el éxito.
+ * Usa forceFormData: true para soportar el envío de archivos (imagen).
  *
  * @param {Object|null} place      - El negocio a editar, o null para creación.
  * @param {Function}    put        - Función put de useForm (Inertia).
@@ -37,11 +37,14 @@ export function buildSubmitHandler({ place, put, post, onClose }) {
         e.preventDefault();
 
         if (place) {
-            put(route('owner.places.update', place.id), {
+            post(route('owner.places.update', place.id), {
+                forceFormData: true,
+                _method: 'PUT',
                 onSuccess: () => onClose(),
             });
         } else {
             post(route('owner.places.store'), {
+                forceFormData: true,
                 onSuccess: () => onClose(),
             });
         }
@@ -51,6 +54,7 @@ export function buildSubmitHandler({ place, put, post, onClose }) {
 /**
  * Definición declarativa de los campos del formulario.
  * Útil para renderizado dinámico o validación futura.
+ * Nota: el campo 'image' se gestiona aparte por su naturaleza especial (File input).
  */
 export const PLACE_FORM_FIELDS = [
     { key: 'name',        label: 'Nombre del negocio', type: 'text',     colSpan: 'full' },

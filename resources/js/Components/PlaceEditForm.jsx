@@ -1,18 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { getInitialFormValues, buildSubmitHandler } from '@/Utils/editPlaceUtils';
 
-/**
- * PlaceEditForm
- *
- * Componente de formulario reutilizable para crear o editar un negocio.
- * No incluye ningún wrapper de modal; puede usarse tanto dentro de un modal
- * como en una página propia.
- *
- * Props:
- *  - place      {Object|null}  Negocio a editar. Si es null, actúa como formulario de creación.
- *  - categories {Array}        Lista de categorías disponibles.
- *  - onClose    {Function}     Callback invocado tras guardar con éxito o al pulsar Cancelar.
- */
 export default function PlaceEditForm({ place, categories, onClose }) {
     const { data, setData, post, put, processing, errors } = useForm(
         getInitialFormValues(place)
@@ -113,6 +101,46 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                 />
                 {errors.hours && <p className="text-red-500 text-xs mt-1">{errors.hours}</p>}
             </div>
+
+            {/* ── IMAGEN ─────────────────────────────────────────── */}
+            <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Imagen del negocio
+                </label>
+
+                {/* Preview de la imagen actual si existe */}
+                {place?.image && !data.image && (
+                    <div className="mb-2">
+                        <img
+                            src={`/storage/${place.image}`}
+                            alt="Imagen actual"
+                            className="h-24 w-auto rounded-lg object-cover border border-gray-200"
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Imagen actual — sube una nueva para reemplazarla</p>
+                    </div>
+                )}
+
+                {/* Preview de la imagen nueva seleccionada */}
+                {data.image && (
+                    <div className="mb-2">
+                        <img
+                            src={URL.createObjectURL(data.image)}
+                            alt="Nueva imagen"
+                            className="h-24 w-auto rounded-lg object-cover border border-amber-300"
+                        />
+                        <p className="text-xs text-amber-500 mt-1">Nueva imagen seleccionada</p>
+                    </div>
+                )}
+
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setData('image', e.target.files[0] ?? null)}
+                    className="w-full text-sm text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 transition"
+                />
+                {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
+            </div>
+            {/* ────────────────────────────────────────────────────── */}
 
             {/* Acciones */}
             <div className="flex items-center justify-end gap-3 pt-2">

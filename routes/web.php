@@ -30,9 +30,9 @@ Route::middleware('auth')->group(function () {
     // Propietario: crear negocio
     Route::post('/owner/places', [OwnerPlaceController::class, 'store'])
         ->name('owner.places.store');
-    
+
     // Propietario: actualizar sus negocios
-    Route::put('/owner/places/{place}', [OwnerPlaceController::class, 'update'])
+    Route::post('/owner/places/{place}', [OwnerPlaceController::class, 'update'])
         ->name('owner.places.update');
 });
 

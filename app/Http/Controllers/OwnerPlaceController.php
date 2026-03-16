@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Places;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class OwnerPlaceController extends Controller
 {
@@ -17,9 +18,14 @@ class OwnerPlaceController extends Controller
             'phone'       => 'nullable|string|max:30',
             'hours'       => 'nullable|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $place = $request->user()->places()->create($validated);
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('places', 'public');
+        }
+
+        $request->user()->places()->create($validated);
 
         return redirect()->route('dashboard')->with('success', 'Negocio creado correctamente.');
     }
@@ -35,7 +41,17 @@ class OwnerPlaceController extends Controller
             'phone'       => 'nullable|string|max:30',
             'hours'       => 'nullable|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
+
+        if ($request->hasFile('image')) {
+            // Elimina la imagen anterior para no dejar archivos huérfanos
+            if ($place->image) {
+                Storage::disk('public')->delete($place->image);
+            }
+
+            $validated['image'] = $request->file('image')->store('places', 'public');
+        }
 
         $place->update($validated);
 
