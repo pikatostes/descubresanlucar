@@ -36,4 +36,11 @@ class Places extends Model
     {
         return $this->belongsToMany(Tag::class, 'place_tag', 'place_id', 'tag_id');
     }
+
+    protected function image(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn($value) => $value ? asset('storage/' . $value) : null,
+        );
+    }
 }
