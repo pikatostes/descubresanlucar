@@ -25,11 +25,16 @@ export default function PlaceCard({ place }) {
 
                 {/* Tags */}
                 <div className="card-tags">
-                    {place.tags?.slice(0, 3).map((tag) => (
-                        <span key={tag.id || tag.name} className="tag">
-                            {typeof tag === 'object' ? tag.name : tag}
-                        </span>
-                    ))}
+                    {place.tags?.slice(0, 3).map((tag, index) => {
+                        const tagLabel = typeof tag === 'object' ? tag.name : tag;
+                        const tagId = typeof tag === 'object' ? tag.id : tag;
+
+                        return (
+                            <span key={`${place.id}-tag-${tagId}-${index}`} className="tag">
+                                {tagLabel}
+                            </span>
+                        );
+                    })}
                 </div>
 
                 {/* Footer */}
