@@ -52,6 +52,32 @@ export function buildSubmitHandler({ place, put, post, onClose }) {
 }
 
 /**
+ * Obtiene todos los tags desde el backend
+ *
+ * @returns {Promise<Array>} Lista de tags
+ */
+export async function fetchAllTags() {
+    try {
+        const response = await fetch(route('tags.index'), {
+            headers: {
+                'Accept': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al obtener los tags');
+        }
+
+        const tags = await response.json();
+
+        return tags;
+    } catch (error) {
+        console.error('fetchAllTags error:', error);
+        return [];
+    }
+}
+
+/**
  * Definición declarativa de los campos del formulario.
  * Útil para renderizado dinámico o validación futura.
  * Nota: el campo 'image' se gestiona aparte por su naturaleza especial (File input).

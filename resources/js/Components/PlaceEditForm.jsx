@@ -1,15 +1,38 @@
 import { useForm } from '@inertiajs/react';
-import { getInitialFormValues, buildSubmitHandler } from '@/Utils/editPlaceUtils';
+import { useEffect, useState } from 'react';
+import { getInitialFormValues, buildSubmitHandler, fetchAllTags } from '@/Utils/editPlaceUtils';
 
 export default function PlaceEditForm({ place, categories, onClose }) {
-    const { data, setData, post, put, processing, errors } = useForm(
-        getInitialFormValues(place)
-    );
+    const { data, setData, post, put, processing, errors } = useForm({
+        ...getInitialFormValues(place),
+        tags: place?.tags?.map(t => Number(t.id)) ?? [], // importante para edición
+    });
 
     const handleSubmit = buildSubmitHandler({ place, put, post, onClose });
 
+    const [tags, setTags] = useState([]);
+
+    // 🔹 Cargar todos los tags
+    useEffect(() => {
+        fetchAllTags().then(setTags);
+    }, []);
+
+    // 🔹 Filtrar por categoría seleccionada
+    const filteredTags = tags.filter(tag => tag.category_id == data.category_id);
+
+    // 🔹 Manejar selección de tags
+    const toggleTag = (tagId) => {
+        const normalizedTagId = Number(tagId);
+
+        if (data.tags.includes(normalizedTagId)) {
+            setData('tags', data.tags.filter(id => id !== normalizedTagId));
+        } else {
+            setData('tags', [...data.tags, normalizedTagId]);
+        }
+    };
+
     return (
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
 
             {/* Nombre */}
             <div>
@@ -33,7 +56,10 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                     </label>
                     <select
                         value={data.category_id}
-                        onChange={e => setData('category_id', e.target.value)}
+                        onChange={e => {
+                            setData('category_id', e.target.value);
+                            setData('tags', []);
+                        }}
                         className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition bg-white"
                     >
                         <option value="">Sin categoría</option>
@@ -42,6 +68,42 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                         ))}
                     </select>
                     {errors.category_id && <p className="text-red-500 text-xs mt-1">{errors.category_id}</p>}
+                </div>
+            )}
+
+            {/* Tags dinámicos */}
+            {data.category_id && (
+                <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                        Tags
+                    </label>
+
+                    {filteredTags.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                            {filteredTags.map(tag => {
+                                const isSelected = data.tags.includes(tag.id);
+
+                                return (
+                                    <button
+                                        type="button"
+                                        key={tag.id}
+                                        onClick={() => toggleTag(tag.id)}
+                                        className={`px-3 py-1 text-xs rounded-full border transition
+                                            ${isSelected
+                                                ? 'bg-amber-500 text-white border-amber-500'
+                                                : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200'
+                                            }`}
+                                    >
+                                        {tag.name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <p className="text-xs text-gray-400">No hay tags para esta categoría</p>
+                    )}
+
+                    {errors.tags && <p className="text-red-500 text-xs mt-1">{errors.tags}</p>}
                 </div>
             )}
 
@@ -102,13 +164,12 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                 {errors.hours && <p className="text-red-500 text-xs mt-1">{errors.hours}</p>}
             </div>
 
-            {/* ── IMAGEN ─────────────────────────────────────────── */}
+            {/* Imagen */}
             <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
                     Imagen del negocio
                 </label>
 
-                {/* Preview de la imagen actual si existe */}
                 {place?.image && !data.image && (
                     <div className="mb-2">
                         <img
@@ -116,11 +177,9 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                             alt="Imagen actual"
                             className="h-24 w-auto rounded-lg object-cover border border-gray-200"
                         />
-                        <p className="text-xs text-gray-400 mt-1">Imagen actual — sube una nueva para reemplazarla</p>
                     </div>
                 )}
 
-                {/* Preview de la imagen nueva seleccionada */}
                 {data.image && (
                     <div className="mb-2">
                         <img
@@ -128,7 +187,6 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                             alt="Nueva imagen"
                             className="h-24 w-auto rounded-lg object-cover border border-amber-300"
                         />
-                        <p className="text-xs text-amber-500 mt-1">Nueva imagen seleccionada</p>
                     </div>
                 )}
 
@@ -136,25 +194,24 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                     type="file"
                     accept="image/*"
                     onChange={e => setData('image', e.target.files[0] ?? null)}
-                    className="w-full text-sm text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 transition"
+                    className="w-full text-sm text-gray-600"
                 />
                 {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
             </div>
-            {/* ────────────────────────────────────────────────────── */}
 
             {/* Acciones */}
             <div className="flex items-center justify-end gap-3 pt-2">
                 <button
                     type="button"
                     onClick={onClose}
-                    className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition"
+                    className="px-4 py-2 text-sm text-gray-600"
                 >
                     Cancelar
                 </button>
                 <button
                     type="submit"
                     disabled={processing}
-                    className="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="px-5 py-2 bg-amber-500 text-white text-sm font-semibold rounded-lg"
                 >
                     {processing ? 'Guardando…' : 'Guardar cambios'}
                 </button>

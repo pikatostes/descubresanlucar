@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Places;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class OwnerPlaceController extends Controller
 {
@@ -18,6 +20,10 @@ class OwnerPlaceController extends Controller
             'phone'       => 'nullable|string|max:30',
             'hours'       => 'nullable|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
+            'tags'        => 'nullable|array',
+            'tags.*'      => ['integer', Rule::exists('tags', 'id')->where(
+                fn ($query) => $query->where('category_id', $request->input('category_id'))
+            )],
             'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
@@ -25,7 +31,8 @@ class OwnerPlaceController extends Controller
             $validated['image'] = $request->file('image')->store('places', 'public');
         }
 
-        $request->user()->places()->create($validated);
+        $place = $request->user()->places()->create(Arr::except($validated, ['tags']));
+        $place->tags()->sync($validated['tags'] ?? []);
 
         return redirect()->route('dashboard')->with('success', 'Negocio creado correctamente.');
     }
@@ -41,6 +48,10 @@ class OwnerPlaceController extends Controller
             'phone'       => 'nullable|string|max:30',
             'hours'       => 'nullable|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
+            'tags'        => 'nullable|array',
+            'tags.*'      => ['integer', Rule::exists('tags', 'id')->where(
+                fn ($query) => $query->where('category_id', $request->input('category_id'))
+            )],
             'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
@@ -53,7 +64,8 @@ class OwnerPlaceController extends Controller
             $validated['image'] = $request->file('image')->store('places', 'public');
         }
 
-        $place->update($validated);
+        $place->update(Arr::except($validated, ['tags']));
+        $place->tags()->sync($validated['tags'] ?? []);
 
         return back()->with('success', 'Negocio actualizado correctamente.');
     }

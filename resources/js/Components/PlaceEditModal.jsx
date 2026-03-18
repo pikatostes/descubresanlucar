@@ -24,10 +24,10 @@ function IconStore() {
 export default function PlaceEditModal({ place, categories, onClose }) {
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm overflow-y-auto py-6"
             onClick={(e) => e.target === e.currentTarget && onClose()}
         >
-            <div className="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div className="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
 
                 {/* Cabecera */}
                 <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4 flex items-center justify-between">
@@ -47,11 +47,7 @@ export default function PlaceEditModal({ place, categories, onClose }) {
                 </div>
 
                 {/* Formulario */}
-                <PlaceEditForm
-                    place={place}
-                    categories={categories}
-                    onClose={onClose}
-                />
+                <PlaceEditForm place={place} categories={categories} onClose={onClose} />
             </div>
         </div>
     );
