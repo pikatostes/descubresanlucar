@@ -38,7 +38,7 @@ function PlaceCard({ place, onEdit }) {
         <div className="group relative bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
             <div className="h-32 bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center overflow-hidden">
                 {place.image
-                    ? <img src={`/storage/${place.image}`} alt={place.name}
+                    ? <img src={`${place.image}`} alt={place.name}
                         className="w-full h-full object-cover" />
                     : <span className="text-4xl opacity-30"><IconStore /></span>
                 }

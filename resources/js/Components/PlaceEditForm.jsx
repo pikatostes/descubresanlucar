@@ -112,7 +112,7 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                 {place?.image && !data.image && (
                     <div className="mb-2">
                         <img
-                            src={`/storage/${place.image}`}
+                            src={`${place.image}`}
                             alt="Imagen actual"
                             className="h-24 w-auto rounded-lg object-cover border border-gray-200"
                         />
