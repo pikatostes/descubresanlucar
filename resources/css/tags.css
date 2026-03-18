@@ -20,11 +20,8 @@
 ═══════════════════════════════════════════ */
 
 .tag-dropdown {
-    position: absolute;
-    top: calc(100% + 10px);
-    left: 0;                        /* ✅ alineado al borde izquierdo del botón */
+    position: fixed;
     z-index: 9999;
-
     background: #fffaf7;
     border: 1px solid rgba(196, 82, 34, 0.15);
     border-radius: 14px;
@@ -32,10 +29,7 @@
     box-shadow:
         0 8px 24px rgba(196, 82, 34, 0.12),
         0 2px 6px rgba(0, 0, 0, 0.06);
-
-    min-width: 180px;
-    white-space: nowrap;
-
+    max-width: min(420px, calc(100vw - 24px));
     animation: dropdownFadeIn 0.18s ease forwards;
 }
 
@@ -53,16 +47,7 @@
 
 /* Flechita decorativa hacia arriba */
 .tag-dropdown::before {
-    content: "";
-    position: absolute;
-    top: -6px;
-    left: 20px;
-    width: 12px;
-    height: 12px;
-    background: #fffaf7;
-    border-left: 1px solid rgba(196, 82, 34, 0.15);
-    border-top: 1px solid rgba(196, 82, 34, 0.15);
-    rotate: 45deg;
+    content: none;
 }
 
 .tag-dropdown__title {

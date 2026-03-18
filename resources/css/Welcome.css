@@ -329,7 +329,7 @@ body {
     border-bottom: 1px solid var(--cream-dark);
     position: sticky;
     top: 68px;
-    z-index: 90;
+    z-index: 120;
     box-shadow: var(--shadow-sm);
 }
 
@@ -382,6 +382,8 @@ body {
     flex: 1;
     padding: 40px 0 80px;
     background: var(--cream);
+    position: relative;
+    z-index: 1;
 }
 
 /* ── Filter bar ─────────────────────────────────────────────── */
