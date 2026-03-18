@@ -99,6 +99,7 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
 
     const [editingPlace, setEditingPlace]     = useState(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    console.log(user)
 
     return (
         <AuthenticatedLayout

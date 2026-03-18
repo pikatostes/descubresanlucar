@@ -143,7 +143,7 @@ export default function Navbar({ auth }) {
             {/* Menú móvil desplegable */}
             <div className={`md:hidden absolute top-full left-0 w-full z-50 shadow-lg bg-white overflow-hidden transition-all duration-300 ease-in-out ${menuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'}`}>
                 <div className="flex flex-col gap-2 px-4 pb-4 pt-2">
-                    <Link href="/lugares" className="nav-link py-2 border-b border-gray-100" onClick={() => setMenuOpen(false)}>
+                    <Link href="/explorar" className="nav-link py-2 border-b border-gray-100" onClick={() => setMenuOpen(false)}>
                         Explorar
                     </Link>
                     <Link href="/categorias" className="nav-link py-2 border-b border-gray-100" onClick={() => setMenuOpen(false)}>

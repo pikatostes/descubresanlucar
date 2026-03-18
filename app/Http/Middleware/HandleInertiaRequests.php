@@ -37,6 +37,7 @@ class HandleInertiaRequests extends Middleware
                     'name'   => $request->user()->name,
                     'email'  => $request->user()->email,
                     'role'   => $request->user()->role,   // columna directa de la tabla users
+                    'created_at' => $request->user()->created_at->toDateTimeString(),
                     'avatar' => $request->user()->avatar ?? null,
                 ] : null,
             ],
