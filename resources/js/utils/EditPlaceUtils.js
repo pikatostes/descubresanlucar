@@ -32,9 +32,20 @@ export function getInitialFormValues(place) {
  * @param {Function}    onClose    - Callback para cerrar el modal tras éxito.
  * @returns {Function} Handler listo para usar en onSubmit del formulario.
  */
-export function buildSubmitHandler({ place, put, post, onClose }) {
+export function buildSubmitHandler({ place, put, post, transform, onClose }) {
     return function handleSubmit(e) {
         e.preventDefault();
+
+        const payloadWithoutNullImage = (formData) => {
+            if (formData.image == null) {
+                const { image, ...payload } = formData;
+                return payload;
+            }
+
+            return formData;
+        };
+
+        transform(payloadWithoutNullImage);
 
         if (place) {
             post(route('owner.places.update', place.id), {

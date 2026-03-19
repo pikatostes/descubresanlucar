@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react';
 import { getInitialFormValues, buildSubmitHandler, fetchAllTags } from '@/Utils/editPlaceUtils';
 
 export default function PlaceEditForm({ place, categories, onClose }) {
-    const { data, setData, post, put, processing, errors } = useForm({
+    const { data, setData, post, put, transform, processing, errors } = useForm({
         ...getInitialFormValues(place),
         tags: place?.tags?.map(t => Number(t.id)) ?? [], // importante para edición
     });
 
-    const handleSubmit = buildSubmitHandler({ place, put, post, onClose });
+    const handleSubmit = buildSubmitHandler({ place, put, post, transform, onClose });
 
     const [tags, setTags] = useState([]);
 

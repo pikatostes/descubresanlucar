@@ -62,6 +62,8 @@ class OwnerPlaceController extends Controller
             }
 
             $validated['image'] = $request->file('image')->store('places', 'public');
+        } else {
+            unset($validated['image']);
         }
 
         $place->update(Arr::except($validated, ['tags']));
