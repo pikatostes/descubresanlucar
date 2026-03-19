@@ -11,6 +11,10 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class RecentPlacesWidget extends BaseWidget
 {
+    protected static ?int $sort = 99;
+
+    protected int | string | array $columnSpan = 'full';
+
     protected function getTableHeading(): string
     {
         return 'Lugares Recientes';
