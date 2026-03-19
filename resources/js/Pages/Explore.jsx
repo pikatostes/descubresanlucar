@@ -1,25 +1,96 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 import PlaceCard from '../Components/PlaceCard';
+import ExploreSearchBar from '../Components/ExploreSearchBar';
 import '../../css/Explore.css';
 
-export default function Explore({ auth, categories = [], places = [], selectedCategory = null }) {
+export default function Explore({ auth, categories = [], places = [], selectedCategory = null, search = '' }) {
     const [openCategories, setOpenCategories] = useState([]);
+    const [searchText, setSearchText] = useState(search);
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchStatus, setSearchStatus] = useState('');
 
     useEffect(() => {
         if (selectedCategory) {
-            setOpenCategories(prev => 
+            setOpenCategories(prev =>
                 prev.includes(selectedCategory) ? prev : [...prev, selectedCategory]
             );
         }
     }, [selectedCategory]);
 
+    useEffect(() => {
+        setSearchText(search);
+    }, [search]);
+
+    useEffect(() => {
+        const normalizedText = searchText.trim();
+
+        if (normalizedText === search) {
+            return;
+        }
+
+        setIsSearching(true);
+
+        const debounceTimer = setTimeout(() => {
+            router.get(
+                '/explorar',
+                {
+                    category: selectedCategory || undefined,
+                    search: normalizedText || undefined,
+                },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                    only: ['places', 'selectedCategory', 'search'],
+                    onFinish: () => setIsSearching(false),
+                    onError: () => {
+                        setSearchStatus('No se pudo actualizar la búsqueda. Intenta de nuevo.');
+                    },
+                }
+            );
+        }, 350);
+
+        return () => {
+            clearTimeout(debounceTimer);
+        };
+    }, [searchText, search, selectedCategory]);
+
+    useEffect(() => {
+        if (isSearching) {
+            return;
+        }
+
+        if (!search) {
+            setSearchStatus('');
+            return;
+        }
+
+        setSearchStatus(`${places.length} resultado${places.length !== 1 ? 's' : ''} para "${search}".`);
+    }, [isSearching, search, places.length]);
+
+    function buildExploreHref(categoryId = null) {
+        const params = new URLSearchParams();
+        const currentSearch = searchText.trim();
+
+        if (categoryId) {
+            params.set('category', categoryId);
+        }
+
+        if (currentSearch) {
+            params.set('search', currentSearch);
+        }
+
+        const query = params.toString();
+        return query ? `/explorar?${query}` : '/explorar';
+    }
+
     function toggleCategory(e, categoryId) {
         e.preventDefault();
         e.stopPropagation();
-        setOpenCategories(prev => 
+        setOpenCategories(prev =>
             prev.includes(categoryId)
                 ? prev.filter(id => id !== categoryId)
                 : [...prev, categoryId]
@@ -28,7 +99,22 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
 
     function handleClearFilter(e) {
         e.preventDefault();
-        window.location.href = '/explorar';
+        router.get(
+            '/explorar',
+            {
+                search: searchText.trim() || undefined,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            }
+        );
+    }
+
+    function handleClearSearch() {
+        setSearchText('');
+        setSearchStatus('');
     }
 
     return (
@@ -57,21 +143,23 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
                             <aside className="explore-sidebar">
                                 <div className="categories-panel">
                                     <h2 className="panel-title">Categorías</h2>
-                                    
+
                                     {categories.length === 0 ? (
                                         <p className="no-categories">No hay categorías disponibles</p>
                                     ) : (
                                         <div className="categories-list">
                                             {categories.map(category => (
                                                 <div key={category.id} className="category-item">
-                                                    <Link 
-                                                        href={`/explorar?category=${category.id}`}
+                                                    <Link
+                                                        href={buildExploreHref(category.id)}
                                                         className={`category-header ${selectedCategory === category.id ? 'active' : ''}`}
+                                                        preserveScroll
+                                                        preserveState
                                                     >
                                                         <span className="category-icon">{category.icon}</span>
                                                         <span className="category-name">{category.label}</span>
                                                         {category.tags && category.tags.length > 0 && (
-                                                            <span 
+                                                            <span
                                                                 className={`category-arrow ${openCategories.includes(category.id) ? 'open' : ''}`}
                                                                 onClick={(e) => toggleCategory(e, category.id)}
                                                             >
@@ -79,14 +167,16 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
                                                             </span>
                                                         )}
                                                     </Link>
-                                                    
+
                                                     {category.tags && category.tags.length > 0 && openCategories.includes(category.id) && (
                                                         <div className="tags-dropdown">
                                                             {category.tags.map(tag => (
                                                                 <Link
                                                                     key={tag.id}
-                                                                    href={`/explorar?category=${category.id}`}
+                                                                    href={buildExploreHref(category.id)}
                                                                     className="tag-button"
+                                                                    preserveScroll
+                                                                    preserveState
                                                                 >
                                                                     {tag.name}
                                                                 </Link>
@@ -106,7 +196,7 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
                                     <>
                                         <div className="results-header">
                                             <h2 className="results-title">
-                                                {selectedCategory 
+                                                {selectedCategory
                                                     ? categories.find(c => c.id === selectedCategory)?.label || 'Lugares'
                                                     : 'Todos los lugares'
                                                 }
@@ -122,7 +212,15 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
                                                 </span>
                                             </div>
                                         </div>
-                                        
+
+                                        <ExploreSearchBar
+                                            value={searchText}
+                                            onChange={setSearchText}
+                                            onClear={handleClearSearch}
+                                            isSearching={isSearching}
+                                            statusText={searchStatus}
+                                        />
+
                                         <div className="places-grid">
                                             {places.map(place => (
                                                 <PlaceCard key={place.id} place={place} />

@@ -12,6 +12,7 @@ class ExploreController extends Controller
     public function index(Request $request)
     {
         $categoryId = $request->query('category');
+        $search = trim((string) $request->query('search', ''));
         
         $categories = Category::with('tags')->orderBy('label')->get();
         
@@ -20,6 +21,10 @@ class ExploreController extends Controller
         if ($categoryId) {
             $placesQuery->where('category_id', $categoryId);
         }
+
+        if ($search !== '') {
+            $placesQuery->where('name', 'like', '%' . $search . '%');
+        }
         
         $places = $placesQuery->latest()->get();
         
@@ -27,6 +32,7 @@ class ExploreController extends Controller
             'categories' => $categories,
             'places' => $places,
             'selectedCategory' => $categoryId ? (int) $categoryId : null,
+            'search' => $search,
         ]);
     }
 }
