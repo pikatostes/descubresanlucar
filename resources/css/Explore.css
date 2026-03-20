@@ -196,6 +196,13 @@
     background: #fff5f2;
 }
 
+.tag-button.active {
+    border-color: var(--color-primary, #e8572a);
+    color: var(--color-primary, #e8572a);
+    background: #fff5f2;
+    font-weight: 600;
+}
+
 /* Resultados */
 .explore-results {
     min-height: 400px;
@@ -335,6 +342,11 @@
     gap: 1.5rem;
 }
 
+.places-lazy-trigger {
+    width: 100%;
+    height: 1px;
+}
+
 /* Estado vacío */
 .no-results {
     text-align: center;
@@ -388,7 +400,17 @@
     .explore-sidebar-toggle {
         display: inline-flex;
         align-items: center;
-        margin-bottom: 0.25rem;
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        margin: 0;
+        z-index: 120;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .explore-sidebar-toggle.is-open {
+        opacity: 0;
+        pointer-events: none;
     }
 
     .explore-sidebar-overlay {

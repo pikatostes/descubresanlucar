@@ -1,5 +1,5 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { Head, Link } from '@inertiajs/react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 import PlaceCard from '../Components/PlaceCard';
@@ -8,23 +8,91 @@ import '../../css/Explore.css';
 
 export default function Explore({ auth, categories = [], places = [], selectedCategory = null, search = '' }) {
     const [openCategories, setOpenCategories] = useState([]);
-    const [searchText, setSearchText] = useState(search);
+    const [activeCategory, setActiveCategory] = useState(selectedCategory);
+    const [activeTag, setActiveTag] = useState(() => {
+        if (typeof window === 'undefined') {
+            return null;
+        }
+
+        const tagParam = new URLSearchParams(window.location.search).get('tag');
+        return tagParam ? Number(tagParam) : null;
+    });
+    const [searchText, setSearchText] = useState(search.trim());
+    const [debouncedSearch, setDebouncedSearch] = useState(search.trim());
     const [isSearching, setIsSearching] = useState(false);
     const [searchStatus, setSearchStatus] = useState('');
     const [isMobile, setIsMobile] = useState(false);
     const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+    const [visibleCount, setVisibleCount] = useState(9);
+    const loadMoreRef = useRef(null);
+
+    const activeTagLabel = useMemo(() => {
+        if (!activeTag) {
+            return null;
+        }
+
+        for (const category of categories) {
+            const matchedTag = category.tags?.find((tag) => Number(tag.id) === Number(activeTag));
+            if (matchedTag) {
+                return matchedTag.name;
+            }
+        }
+
+        return null;
+    }, [categories, activeTag]);
+
+    const filteredPlaces = useMemo(() => {
+        const normalizedSearch = debouncedSearch.toLowerCase();
+
+        return places.filter((place) => {
+            const placeCategoryId = place.category_id ?? place.category?.id ?? null;
+            const matchesCategory = activeCategory ? Number(placeCategoryId) === Number(activeCategory) : true;
+
+            const placeName = (place.name || '').toLowerCase();
+            const matchesSearch = normalizedSearch ? placeName.includes(normalizedSearch) : true;
+
+            const placeTags = Array.isArray(place.tags) ? place.tags : [];
+            const matchesTag = activeTag
+                ? placeTags.some((tag) => Number(typeof tag === 'object' ? tag.id : tag) === Number(activeTag))
+                : true;
+
+            return matchesCategory && matchesSearch && matchesTag;
+        });
+    }, [places, activeCategory, debouncedSearch, activeTag]);
+
+    const visiblePlaces = useMemo(
+        () => filteredPlaces.slice(0, visibleCount),
+        [filteredPlaces, visibleCount]
+    );
+
+    const hasMorePlaces = visibleCount < filteredPlaces.length;
 
     useEffect(() => {
-        if (selectedCategory) {
+        if (activeCategory) {
             setOpenCategories(prev =>
-                prev.includes(selectedCategory) ? prev : [...prev, selectedCategory]
+                prev.includes(activeCategory) ? prev : [...prev, activeCategory]
             );
         }
-    }, [selectedCategory]);
+    }, [activeCategory]);
 
     useEffect(() => {
-        setSearchText(search);
-    }, [search]);
+        setSearchText(search.trim());
+        setDebouncedSearch(search.trim());
+        setActiveCategory(selectedCategory);
+    }, [search, selectedCategory]);
+
+    useEffect(() => {
+        if (!activeTag || !activeCategory) {
+            return;
+        }
+
+        const currentCategory = categories.find((category) => Number(category.id) === Number(activeCategory));
+        const hasActiveTagInCategory = currentCategory?.tags?.some((tag) => Number(tag.id) === Number(activeTag));
+
+        if (!hasActiveTagInCategory) {
+            setActiveTag(null);
+        }
+    }, [categories, activeCategory, activeTag]);
 
     useEffect(() => {
         const mediaQuery = window.matchMedia('(max-width: 900px)');
@@ -45,58 +113,65 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
     }, []);
 
     useEffect(() => {
-        const normalizedText = searchText.trim();
-
-        if (normalizedText === search) {
-            return;
-        }
-
         setIsSearching(true);
 
         const debounceTimer = setTimeout(() => {
-            router.get(
-                '/explorar',
-                {
-                    category: selectedCategory || undefined,
-                    search: normalizedText || undefined,
-                },
-                {
-                    preserveState: true,
-                    preserveScroll: true,
-                    replace: true,
-                    only: ['places', 'selectedCategory', 'search'],
-                    onFinish: () => setIsSearching(false),
-                    onError: () => {
-                        setSearchStatus('No se pudo actualizar la búsqueda. Intenta de nuevo.');
-                    },
-                }
-            );
-        }, 350);
+            setDebouncedSearch(searchText.trim());
+            setIsSearching(false);
+        }, 250);
 
         return () => {
             clearTimeout(debounceTimer);
         };
-    }, [searchText, search, selectedCategory]);
+    }, [searchText]);
+
+    useEffect(() => {
+        setVisibleCount(9);
+    }, [activeCategory, activeTag, debouncedSearch]);
+
+    useEffect(() => {
+        if (!hasMorePlaces || !loadMoreRef.current) {
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const [entry] = entries;
+                if (entry.isIntersecting) {
+                    setVisibleCount((prev) => prev + 9);
+                }
+            },
+            { rootMargin: '200px 0px' }
+        );
+
+        observer.observe(loadMoreRef.current);
+
+        return () => observer.disconnect();
+    }, [hasMorePlaces]);
 
     useEffect(() => {
         if (isSearching) {
             return;
         }
 
-        if (!search) {
+        if (!debouncedSearch) {
             setSearchStatus('');
             return;
         }
 
-        setSearchStatus(`${places.length} resultado${places.length !== 1 ? 's' : ''} para "${search}".`);
-    }, [isSearching, search, places.length]);
+        setSearchStatus(`${filteredPlaces.length} resultado${filteredPlaces.length !== 1 ? 's' : ''} para "${debouncedSearch}".`);
+    }, [isSearching, debouncedSearch, filteredPlaces.length]);
 
-    function buildExploreHref(categoryId = null) {
+    useEffect(() => {
         const params = new URLSearchParams();
         const currentSearch = searchText.trim();
 
-        if (categoryId) {
-            params.set('category', categoryId);
+        if (activeCategory) {
+            params.set('category', activeCategory);
+        }
+
+        if (activeTag) {
+            params.set('tag', activeTag);
         }
 
         if (currentSearch) {
@@ -104,7 +179,25 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
         }
 
         const query = params.toString();
-        return query ? `/explorar?${query}` : '/explorar';
+        const nextUrl = query ? `/explorar?${query}` : '/explorar';
+        window.history.replaceState({}, '', nextUrl);
+    }, [activeCategory, activeTag, searchText]);
+
+    function handleSelectCategory(categoryId) {
+        const isSameCategory = Number(activeCategory) === Number(categoryId);
+        setActiveCategory(isSameCategory ? null : categoryId);
+        setActiveTag(null);
+        if (isMobile) {
+            setIsSidebarVisible(false);
+        }
+    }
+
+    function handleSelectTag(tagId, categoryId) {
+        setActiveCategory(categoryId);
+        setActiveTag((prev) => (Number(prev) === Number(tagId) ? null : tagId));
+        if (isMobile) {
+            setIsSidebarVisible(false);
+        }
     }
 
     function toggleCategory(e, categoryId) {
@@ -119,17 +212,8 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
 
     function handleClearFilter(e) {
         e.preventDefault();
-        router.get(
-            '/explorar',
-            {
-                search: searchText.trim() || undefined,
-            },
-            {
-                preserveState: true,
-                preserveScroll: true,
-                replace: true,
-            }
-        );
+        setActiveCategory(null);
+        setActiveTag(null);
     }
 
     function handleClearSearch() {
@@ -163,9 +247,10 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
                                 <button
                                     type="button"
                                     onClick={() => setIsSidebarVisible((prev) => !prev)}
-                                    className="explore-sidebar-toggle"
+                                    className={`explore-sidebar-toggle ${isSidebarVisible ? 'is-open' : ''}`}
+                                    aria-label="Mostrar u ocultar categorías"
                                 >
-                                    {isSidebarVisible ? 'Ocultar categorías' : 'Mostrar categorías'}
+                                    ☰
                                 </button>
                             )}
 
@@ -200,12 +285,11 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
                                     ) : (
                                         <div className="categories-list">
                                             {categories.map(category => (
-                                                <div key={category.id} className="category-item">
-                                                    <Link
-                                                        href={buildExploreHref(category.id)}
-                                                        className={`category-header ${selectedCategory === category.id ? 'active' : ''}`}
-                                                        preserveScroll
-                                                        preserveState
+                                                    <div key={category.id} className="category-item">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleSelectCategory(category.id)}
+                                                        className={`category-header ${Number(activeCategory) === Number(category.id) ? 'active' : ''}`}
                                                     >
                                                         <span className="category-icon">{category.icon}</span>
                                                         <span className="category-name">{category.label}</span>
@@ -217,20 +301,19 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
                                                                 ▼
                                                             </span>
                                                         )}
-                                                    </Link>
+                                                    </button>
 
                                                     {category.tags && category.tags.length > 0 && openCategories.includes(category.id) && (
                                                         <div className="tags-dropdown">
                                                             {category.tags.map(tag => (
-                                                                <Link
+                                                                <button
+                                                                    type="button"
                                                                     key={tag.id}
-                                                                    href={buildExploreHref(category.id)}
-                                                                    className="tag-button"
-                                                                    preserveScroll
-                                                                    preserveState
+                                                                    className={`tag-button ${Number(activeTag) === Number(tag.id) ? 'active' : ''}`}
+                                                                    onClick={() => handleSelectTag(tag.id, category.id)}
                                                                 >
                                                                     {tag.name}
-                                                                </Link>
+                                                                </button>
                                                             ))}
                                                         </div>
                                                     )}
@@ -243,23 +326,25 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
 
                             {/* Columna derecha - Lugares */}
                             <div className="explore-results">
-                                {places.length > 0 ? (
+                                {filteredPlaces.length > 0 ? (
                                     <>
                                         <div className="results-header">
                                             <h2 className="results-title">
-                                                {selectedCategory
-                                                    ? categories.find(c => c.id === selectedCategory)?.label || 'Lugares'
+                                                {activeTagLabel
+                                                    ? `Tag: ${activeTagLabel}`
+                                                    : activeCategory
+                                                    ? categories.find(c => Number(c.id) === Number(activeCategory))?.label || 'Lugares'
                                                     : 'Todos los lugares'
                                                 }
                                             </h2>
                                             <div className="results-actions">
-                                                {selectedCategory && (
+                                                {(activeCategory || activeTag) && (
                                                     <button type="button" onClick={handleClearFilter} className="clear-filter">
                                                         ✕ Limpiar
                                                     </button>
                                                 )}
                                                 <span className="results-count">
-                                                    {places.length} lugar{places.length !== 1 ? 'es' : ''}
+                                                    {filteredPlaces.length} lugar{filteredPlaces.length !== 1 ? 'es' : ''}
                                                 </span>
                                             </div>
                                         </div>
@@ -273,10 +358,11 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
                                         />
 
                                         <div className="places-grid">
-                                            {places.map(place => (
+                                            {visiblePlaces.map(place => (
                                                 <PlaceCard key={place.id} place={place} />
                                             ))}
                                         </div>
+                                        {hasMorePlaces && <div ref={loadMoreRef} className="places-lazy-trigger" aria-hidden="true" />}
                                     </>
                                 ) : (
                                     <div className="no-results">
