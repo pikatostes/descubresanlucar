@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Places extends Model
@@ -35,6 +36,16 @@ class Places extends Model
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'place_tag', 'place_id', 'tag_id');
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class, 'place_id');
+    }
+
+    public function likedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'likes', 'place_id', 'user_id');
     }
 
     protected function image(): \Illuminate\Database\Eloquent\Casts\Attribute

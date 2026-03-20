@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\OwnerPlaceController;
 use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\ProfileController;
@@ -36,6 +37,11 @@ Route::middleware('auth')->group(function () {
     // Propietario: actualizar sus negocios
     Route::post('/owner/places/{place}', [OwnerPlaceController::class, 'update'])
         ->name('owner.places.update');
+
+    Route::post('/lugares/{place}/likes', [LikeController::class, 'store'])
+        ->name('likes.store');
+    Route::delete('/lugares/{place}/likes', [LikeController::class, 'destroy'])
+        ->name('likes.destroy');
 });
 
 require __DIR__ . '/auth.php';

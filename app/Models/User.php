@@ -5,6 +5,8 @@ namespace App\Models;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -45,8 +47,18 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
         return $this->hasRole('admin');
     }
 
-    public function places()
+    public function places(): HasMany
     {
         return $this->hasMany(Places::class);
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function likedPlaces(): BelongsToMany
+    {
+        return $this->belongsToMany(Places::class, 'likes', 'user_id', 'place_id');
     }
 }
