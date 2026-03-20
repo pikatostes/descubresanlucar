@@ -11,6 +11,8 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
     const [searchText, setSearchText] = useState(search);
     const [isSearching, setIsSearching] = useState(false);
     const [searchStatus, setSearchStatus] = useState('');
+    const [isMobile, setIsMobile] = useState(false);
+    const [isSidebarVisible, setIsSidebarVisible] = useState(false);
 
     useEffect(() => {
         if (selectedCategory) {
@@ -23,6 +25,24 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
     useEffect(() => {
         setSearchText(search);
     }, [search]);
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(max-width: 900px)');
+
+        function handleMediaChange(event) {
+            setIsMobile(event.matches);
+            setIsSidebarVisible(!event.matches);
+        }
+
+        setIsMobile(mediaQuery.matches);
+        setIsSidebarVisible(!mediaQuery.matches);
+
+        mediaQuery.addEventListener('change', handleMediaChange);
+
+        return () => {
+            mediaQuery.removeEventListener('change', handleMediaChange);
+        };
+    }, []);
 
     useEffect(() => {
         const normalizedText = searchText.trim();
@@ -139,10 +159,41 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
 
                         {/* Grid 30% - 70% */}
                         <div className="explore-grid">
+                            {isMobile && (
+                                <button
+                                    type="button"
+                                    onClick={() => setIsSidebarVisible((prev) => !prev)}
+                                    className="explore-sidebar-toggle"
+                                >
+                                    {isSidebarVisible ? 'Ocultar categorías' : 'Mostrar categorías'}
+                                </button>
+                            )}
+
+                            {isMobile && (
+                                <button
+                                    type="button"
+                                    className={`explore-sidebar-overlay ${isSidebarVisible ? 'is-visible' : ''}`}
+                                    onClick={() => setIsSidebarVisible(false)}
+                                    aria-label="Cerrar categorías"
+                                />
+                            )}
+
                             {/* Columna izquierda - Categorías con tags */}
-                            <aside className="explore-sidebar">
+                            <aside className={`explore-sidebar ${isMobile ? 'is-mobile' : ''} ${isSidebarVisible ? 'is-open' : ''}`}>
                                 <div className="categories-panel">
-                                    <h2 className="panel-title">Categorías</h2>
+                                    <div className="panel-header">
+                                        <h2 className="panel-title">Categorías</h2>
+                                        {isMobile && (
+                                            <button
+                                                type="button"
+                                                className="panel-close"
+                                                onClick={() => setIsSidebarVisible(false)}
+                                                aria-label="Cerrar categorías"
+                                            >
+                                                ✕
+                                            </button>
+                                        )}
+                                    </div>
 
                                     {categories.length === 0 ? (
                                         <p className="no-categories">No hay categorías disponibles</p>
