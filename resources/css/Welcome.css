@@ -58,7 +58,7 @@ body {
 .navbar {
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 200;
     background: rgba(250, 243, 232, 0.92);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--cream-dark);

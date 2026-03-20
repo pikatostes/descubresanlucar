@@ -1,4 +1,6 @@
 .navbar {
+    position: relative;
+    z-index: 200;
     background: white;
     border-bottom: 1px solid #e5e7eb;
 }
