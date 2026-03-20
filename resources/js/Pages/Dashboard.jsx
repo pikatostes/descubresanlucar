@@ -80,11 +80,10 @@ function PlaceCard({ place, onEdit }) {
             </div>
 
             {place.status && (
-                <div className={`absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
-                    place.status === 'active'
+                <div className={`absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full ${place.status === 'active'
                         ? 'bg-green-100 text-green-700'
                         : 'bg-gray-100 text-gray-500'
-                }`}>
+                    }`}>
                     {place.status === 'active' ? 'Activo' : place.status}
                 </div>
             )}
@@ -97,7 +96,7 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
     const isOwner = auth.user?.role === 'owner';
     const user = auth.user;
 
-    const [editingPlace, setEditingPlace]     = useState(null);
+    const [editingPlace, setEditingPlace] = useState(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
     console.log(user)
 
@@ -218,7 +217,42 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
                 />
             )}
 
-            <Footer />
+            <Footer
+                sections={[
+                    {
+                        title: 'Explorar',
+                        links: [
+                            { label: 'Todos los lugares', href: '/lugares' },
+                            { label: 'Mapa interactivo', href: '/mapa' },
+                            { label: 'Destacados', href: '/destacados' },
+                        ],
+                    },
+                    {
+                        title: 'Categorías',
+                        links: [
+                            { label: 'Restaurantes', href: '/categoria/restaurantes' },
+                            { label: 'Bares', href: '/categoria/bares' },
+                            { label: 'Hoteles', href: '/categoria/hoteles' },
+                        ],
+                    },
+                    {
+                        title: 'Propietarios',
+                        links: [
+                            { label: 'Registrar negocio', href: '/register' },
+                            { label: 'Panel de control', href: '/dashboard' },
+                            { label: 'Cómo funciona', href: '/como-funciona' },
+                        ],
+                    },
+                    {
+                        title: 'Legal',
+                        links: [
+                            { label: 'Privacidad', href: '/privacidad' },
+                            { label: 'Términos de uso', href: '/terminos' },
+                            { label: 'Contacto', href: '/contacto' },
+                        ],
+                    },
+                ]}
+            />
         </AuthenticatedLayout>
     );
 }
