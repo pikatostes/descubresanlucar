@@ -111,7 +111,7 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
         >
             <Head title="DescubreSanlúcar" />
 
-            <div className="py-12">
+            <div className="py-12 min-h-screen">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
