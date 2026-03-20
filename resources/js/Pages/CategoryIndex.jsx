@@ -30,7 +30,7 @@ export default function CategoryIndex({ auth, categories = [] }) {
                                 {categories.map((category) => (
                                     <Link
                                         key={category.id}
-                                        href={`/?category=${category.slug}`}
+                                        href={`/explorar?category=${category.id}`}
                                         className="category-card"
                                     >
                                         <span className="category-icon">{category.icon}</span>
