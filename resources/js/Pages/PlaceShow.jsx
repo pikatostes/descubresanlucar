@@ -7,6 +7,7 @@ import '../../css/PlaceShow.css';
 export default function PlaceShow({ auth, place }) {
     const bgColor = getCategoryColor(place.category);
     const stars = Array.from({ length: 5 }, (_, i) => i < Math.round(place.rating || 0));
+    const mainImage = place.image ?? place.images?.[0]?.url ?? null;
 
     return (
         <>
@@ -21,8 +22,8 @@ export default function PlaceShow({ auth, place }) {
                     <section
                         className="place-hero"
                         style={{
-                            backgroundImage: place.image ? `url(${place.image})` : 'none',
-                            backgroundColor: place.image ? undefined : bgColor,
+                            backgroundImage: mainImage ? `url(${mainImage})` : 'none',
+                            backgroundColor: mainImage ? undefined : bgColor,
                         }}
                     >
                         <div className="place-hero__overlay" />
@@ -42,7 +43,7 @@ export default function PlaceShow({ auth, place }) {
 
                             <div className="place-hero__meta">
                                 {place.address && <span>📍 {place.address}</span>}
-                                {place.hours  && <span>🕐 {place.hours}</span>}
+                                {place.hours && <span>🕐 {place.hours}</span>}
                             </div>
 
                             {place.rating != null && (
@@ -66,6 +67,19 @@ export default function PlaceShow({ auth, place }) {
                                 <section className="place-section">
                                     <h2 className="place-section__title">Sobre el lugar</h2>
                                     <p className="place-section__text">{place.description}</p>
+                                </section>
+                            )}
+
+                            {place.gallery && place.gallery.length > 0 && (
+                                <section className="place-section">
+                                    <h2 className="place-section__title">Galería</h2>
+                                    <div className="place-gallery">
+                                        {place.gallery.map((img, i) => (
+                                            <div key={i} className="place-gallery__item">
+                                                <img src={img} alt={`${place.name} ${i + 1}`} loading="lazy" />
+                                            </div>
+                                        ))}
+                                    </div>
                                 </section>
                             )}
 
@@ -97,32 +111,6 @@ export default function PlaceShow({ auth, place }) {
                                     >
                                         Cómo llegar
                                     </a>
-                                </section>
-                            )}
-
-                            {place.tags && place.tags.length > 0 && (
-                                <section className="place-section">
-                                    <h2 className="place-section__title">Etiquetas</h2>
-                                    <div className="place-tags">
-                                        {place.tags.map((tag) => (
-                                            <span key={tag.id || tag.name} className="tag">
-                                                {typeof tag === 'object' ? tag.name : tag}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </section>
-                            )}
-
-                            {place.gallery && place.gallery.length > 0 && (
-                                <section className="place-section">
-                                    <h2 className="place-section__title">Galería</h2>
-                                    <div className="place-gallery">
-                                        {place.gallery.map((img, i) => (
-                                            <div key={i} className="place-gallery__item">
-                                                <img src={img} alt={`${place.name} ${i + 1}`} loading="lazy" />
-                                            </div>
-                                        ))}
-                                    </div>
                                 </section>
                             )}
                         </div>
@@ -169,6 +157,17 @@ export default function PlaceShow({ auth, place }) {
                                         <span className="info-icon">💶</span>
                                         <span className="price-range">{place.price_range}</span>
                                     </div>
+                                )}
+                                {place.tags && place.tags.length > 0 && (
+                                    <section className="place-section">
+                                        <div className="place-tags">
+                                            {place.tags.map((tag) => (
+                                                <span key={tag.id || tag.name} className="tag">
+                                                    {typeof tag === 'object' ? tag.name : tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </section>
                                 )}
                             </div>
                         </aside>

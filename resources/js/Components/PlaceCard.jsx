@@ -3,13 +3,14 @@ import { getCategoryColor } from '@/utils/filterUtils';
 
 export default function PlaceCard({ place }) {
     const bgColor = getCategoryColor(place.category);
+    const mainImage = place.image ?? place.images?.[0]?.url ?? null;
 
     return (
         <article className="place-card">
             {/* Imagen / Placeholder */}
             <div className="card-image" style={{ backgroundColor: bgColor }}>
-                {place.image ? (
-                    <img src={place.image} alt={place.name} className="card-img" />
+                {mainImage ? (
+                    <img src={mainImage} alt={place.name} className="card-img" />
                 ) : (
                     <div className="card-img-placeholder">
                         <span className="placeholder-icon">{place.category?.icon || '📍'}</span>

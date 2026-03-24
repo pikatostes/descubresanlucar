@@ -25,7 +25,8 @@ class RecentPlacesWidget extends BaseWidget
         return $table
             ->query(Places::latest()->take(5))
             ->columns([
-                ImageColumn::make('image')
+                ImageColumn::make('primaryImage.path')
+                    ->disk('public')
                     ->square()
                     ->size(40),
                 TextColumn::make('name')

@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PlacesResource\Pages;
 use App\Filament\Resources\PlacesResource\RelationManagers;
 use App\Models\Category;
+use App\Models\Tag;
 use App\Models\Places;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -43,9 +44,31 @@ class PlacesResource extends Resource
                 Forms\Components\TextInput::make('hours')
                     ->maxLength(255)
                     ->default(null),
-                Forms\Components\FileUpload::make('image')
-                    ->image(),
-                Forms\Components\Textarea::make('tags')
+                Forms\Components\Repeater::make('images')
+                    ->relationship('images')
+                    ->minItems(1)
+                    ->schema([
+                        Forms\Components\FileUpload::make('path')
+                            ->label('Imagen')
+                            ->image()
+                            ->disk('public')
+                            ->directory('places')
+                            ->required(),
+                        Forms\Components\Toggle::make('is_primary')
+                            ->label('Principal')
+                            ->default(false),
+                        Forms\Components\TextInput::make('sort_order')
+                            ->label('Orden')
+                            ->numeric()
+                            ->default(0)
+                            ->required(),
+                    ])
+                    ->columns(3)
+                    ->columnSpanFull(),
+                Forms\Components\Select::make('tags')
+                    ->relationship('tags', 'name')
+                    ->multiple()
+                    ->options(Tag::query()->orderBy('name')->pluck('name', 'id'))
                     ->columnSpanFull(),
             ]);
     }
@@ -65,7 +88,8 @@ class PlacesResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('hours')
                     ->searchable(),
-                Tables\Columns\ImageColumn::make('image'),
+                Tables\Columns\ImageColumn::make('primaryImage.path')
+                    ->disk('public'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

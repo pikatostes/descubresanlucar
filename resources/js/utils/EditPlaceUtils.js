@@ -18,7 +18,7 @@ export function getInitialFormValues(place) {
         phone:       place?.phone       ?? '',
         hours:       place?.hours       ?? '',
         category_id: place?.category_id ?? '',
-        image:       null, // File object — nunca se pre-pobla desde el servidor
+        images:      [],
     };
 }
 
@@ -36,16 +36,16 @@ export function buildSubmitHandler({ place, put, post, transform, onClose }) {
     return function handleSubmit(e) {
         e.preventDefault();
 
-        const payloadWithoutNullImage = (formData) => {
-            if (formData.image == null) {
-                const { image, ...payload } = formData;
+        const payloadWithoutEmptyImages = (formData) => {
+            if (!Array.isArray(formData.images) || formData.images.length === 0) {
+                const { images, ...payload } = formData;
                 return payload;
             }
 
             return formData;
         };
 
-        transform(payloadWithoutNullImage);
+        transform(payloadWithoutEmptyImages);
 
         if (place) {
             post(route('owner.places.update', place.id), {
@@ -91,7 +91,7 @@ export async function fetchAllTags() {
 /**
  * Definición declarativa de los campos del formulario.
  * Útil para renderizado dinámico o validación futura.
- * Nota: el campo 'image' se gestiona aparte por su naturaleza especial (File input).
+ * Nota: el campo 'images' se gestiona aparte por su naturaleza especial (File input).
  */
 export const PLACE_FORM_FIELDS = [
     { key: 'name',        label: 'Nombre del negocio', type: 'text',     colSpan: 'full' },

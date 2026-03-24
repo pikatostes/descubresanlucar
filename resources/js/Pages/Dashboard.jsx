@@ -34,11 +34,13 @@ function IconPlus() {
 }
 
 function PlaceCard({ place, onEdit }) {
+    const mainImage = place.image ?? place.images?.[0]?.url ?? null;
+
     return (
         <div className="group relative bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
             <div className="h-32 bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center overflow-hidden">
-                {place.image
-                    ? <img src={`${place.image}`} alt={place.name}
+                {mainImage
+                    ? <img src={`${mainImage}`} alt={place.name}
                         className="w-full h-full object-cover" />
                     : <span className="text-4xl opacity-30"><IconStore /></span>
                 }

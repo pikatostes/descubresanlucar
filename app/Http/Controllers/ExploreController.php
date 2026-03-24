@@ -16,7 +16,7 @@ class ExploreController extends Controller
         
         $categories = Category::with('tags')->orderBy('label')->get();
         
-        $placesQuery = Places::with('category', 'tags');
+        $placesQuery = Places::with('category', 'tags', 'images', 'primaryImage');
         
         if ($categoryId) {
             $placesQuery->where('category_id', $categoryId);

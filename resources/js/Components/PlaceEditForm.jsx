@@ -20,30 +20,27 @@ export default function PlaceEditForm({ place, categories, onClose }) {
     // 🔹 Filtrar por categoría seleccionada
     const filteredTags = tags.filter(tag => tag.category_id == data.category_id);
 
-    const selectedImagePreview = useMemo(() => {
-        if (!data.image) return null;
+    const selectedImagePreviews = useMemo(() => {
+        if (!Array.isArray(data.images) || data.images.length === 0) {
+            return [];
+        }
 
-        return URL.createObjectURL(data.image);
-    }, [data.image]);
+        return data.images.map((imageFile) => URL.createObjectURL(imageFile));
+    }, [data.images]);
 
     useEffect(() => {
         return () => {
-            if (selectedImagePreview) {
-                URL.revokeObjectURL(selectedImagePreview);
-            }
+            selectedImagePreviews.forEach((previewUrl) => URL.revokeObjectURL(previewUrl));
         };
-    }, [selectedImagePreview]);
+    }, [selectedImagePreviews]);
 
-    const imageFields = useMemo(() => {
-        return [
-            {
-                id: 'image',
-                label: 'Imagen principal',
-                existingImage: place?.image ?? null,
-                previewImage: selectedImagePreview,
-            },
-        ];
-    }, [place?.image, selectedImagePreview]);
+    const existingImages = useMemo(() => {
+        if (!Array.isArray(place?.images)) {
+            return place?.image ? [{ id: 'legacy-image', url: place.image }] : [];
+        }
+
+        return place.images;
+    }, [place]);
 
     // 🔹 Manejar selección de tags
     const toggleTag = (tagId) => {
@@ -197,40 +194,50 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                         Imágenes del negocio
                     </label>
 
-                    {imageFields.map((imageField) => {
-                        return (
-                            <div key={imageField.id} className="rounded-xl border border-gray-200 p-3 space-y-3">
-                                <p className="text-xs font-medium text-gray-500">{imageField.label}</p>
+                    <div className="rounded-xl border border-gray-200 p-3 space-y-3">
+                        <p className="text-xs font-medium text-gray-500">Imágenes del negocio</p>
 
-                                <div className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center">
-                                    {imageField.previewImage ? (
+                        {selectedImagePreviews.length > 0 ? (
+                            <div className="grid grid-cols-2 gap-2">
+                                {selectedImagePreviews.map((previewUrl, index) => (
+                                    <div key={`new-image-${index}`} className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 border border-dashed border-gray-300">
                                         <img
-                                            src={imageField.previewImage}
-                                            alt={`Nueva ${imageField.label.toLowerCase()}`}
+                                            src={previewUrl}
+                                            alt={`Nueva imagen ${index + 1}`}
                                             className="h-full w-full object-cover"
                                         />
-                                    ) : imageField.existingImage ? (
-                                        <img
-                                            src={imageField.existingImage}
-                                            alt={`Actual ${imageField.label.toLowerCase()}`}
-                                            className="h-full w-full object-cover"
-                                        />
-                                    ) : (
-                                        <span className="text-xs text-gray-400 px-3 text-center">Sin imagen seleccionada</span>
-                                    )}
-                                </div>
-
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={e => setData('image', e.target.files[0] ?? null)}
-                                    className="w-full text-sm text-gray-600"
-                                />
+                                    </div>
+                                ))}
                             </div>
-                        );
-                    })}
+                        ) : existingImages.length > 0 ? (
+                            <div className="grid grid-cols-2 gap-2">
+                                {existingImages.map((existingImage, index) => (
+                                    <div key={existingImage.id ?? `existing-image-${index}`} className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 border border-dashed border-gray-300">
+                                        <img
+                                            src={existingImage.url}
+                                            alt={`Imagen actual ${index + 1}`}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center">
+                                <span className="text-xs text-gray-400 px-3 text-center">Sin imagen seleccionada</span>
+                            </div>
+                        )}
 
-                    {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={e => setData('images', Array.from(e.target.files ?? []))}
+                            className="w-full text-sm text-gray-600"
+                        />
+                    </div>
+
+                    {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
+                    {errors['images.0'] && <p className="text-red-500 text-xs mt-1">{errors['images.0']}</p>}
                 </div>
             </div>
 

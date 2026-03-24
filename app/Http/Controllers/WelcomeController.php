@@ -18,13 +18,19 @@ class WelcomeController extends Controller
             'laravelVersion' => Application::VERSION,
             'phpVersion'     => PHP_VERSION,
 
-            'places' => Places::with(['category', 'tags'])->get()->map(fn($place) => [
+            'places' => Places::with(['category', 'tags', 'images', 'primaryImage'])->get()->map(fn($place) => [
                 'id'          => $place->id,
                 'name'        => $place->name,
                 'slug'        => $place->slug,
                 'description' => $place->description,
                 'address'     => $place->address,
                 'image'       => $place->image,
+                'images'      => $place->images->map(fn ($image) => [
+                    'id' => $image->id,
+                    'url' => $image->url,
+                    'is_primary' => $image->is_primary,
+                    'sort_order' => $image->sort_order,
+                ])->values(),
                 'rating'      => $place->rating,
                 'featured'    => $place->featured,
                 // category sigue siendo objeto { slug, label, icon } — compatible con FilterUtils

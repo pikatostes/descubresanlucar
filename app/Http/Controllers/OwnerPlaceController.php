@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Places;
+use App\Models\PlaceImage;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class OwnerPlaceController extends Controller
@@ -24,15 +26,16 @@ class OwnerPlaceController extends Controller
             'tags.*'      => ['integer', Rule::exists('tags', 'id')->where(
                 fn ($query) => $query->where('category_id', $request->input('category_id'))
             )],
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'images'      => 'required|array|min:1',
+            'images.*'    => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('places', 'public');
-        }
+        DB::transaction(function () use ($request, $validated): void {
+            $place = $request->user()->places()->create(Arr::except($validated, ['tags', 'images']));
+            $place->tags()->sync($validated['tags'] ?? []);
 
-        $place = $request->user()->places()->create(Arr::except($validated, ['tags']));
-        $place->tags()->sync($validated['tags'] ?? []);
+            $this->storeUploadedImages($place, $request->file('images', []));
+        });
 
         return redirect()->route('dashboard')->with('success', 'Negocio creado correctamente.');
     }
@@ -52,23 +55,60 @@ class OwnerPlaceController extends Controller
             'tags.*'      => ['integer', Rule::exists('tags', 'id')->where(
                 fn ($query) => $query->where('category_id', $request->input('category_id'))
             )],
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'images'      => 'nullable|array',
+            'images.*'    => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        if ($request->hasFile('image')) {
-            // Elimina la imagen anterior para no dejar archivos huérfanos
-            if ($place->image) {
-                Storage::disk('public')->delete($place->image);
+        DB::transaction(function () use ($request, $validated, $place): void {
+            $place->update(Arr::except($validated, ['tags', 'images']));
+            $place->tags()->sync($validated['tags'] ?? []);
+
+            $uploadedImages = $request->file('images', []);
+            if (!empty($uploadedImages)) {
+                $this->storeUploadedImages($place, $uploadedImages);
             }
-
-            $validated['image'] = $request->file('image')->store('places', 'public');
-        } else {
-            unset($validated['image']);
-        }
-
-        $place->update(Arr::except($validated, ['tags']));
-        $place->tags()->sync($validated['tags'] ?? []);
+        });
 
         return back()->with('success', 'Negocio actualizado correctamente.');
+    }
+
+    /**
+     * @param  array<int, UploadedFile>  $uploadedImages
+     */
+    private function storeUploadedImages(Places $place, array $uploadedImages): void
+    {
+        if (empty($uploadedImages)) {
+            return;
+        }
+
+        $nextSortOrder = ((int) $place->images()->max('sort_order')) + 1;
+        $hasPrimaryImage = $place->images()->where('is_primary', true)->exists();
+
+        foreach ($uploadedImages as $index => $image) {
+            $path = $image->store('places', 'public');
+
+            $place->images()->create([
+                'path' => $path,
+                'is_primary' => !$hasPrimaryImage && $index === 0,
+                'sort_order' => $nextSortOrder + $index,
+            ]);
+        }
+
+        $this->ensurePrimaryImage($place);
+    }
+
+    private function ensurePrimaryImage(Places $place): void
+    {
+        $hasPrimary = $place->images()->where('is_primary', true)->exists();
+
+        if ($hasPrimary) {
+            return;
+        }
+
+        $firstImage = $place->images()->orderBy('sort_order')->orderBy('id')->first();
+
+        if ($firstImage instanceof PlaceImage) {
+            $firstImage->update(['is_primary' => true]);
+        }
     }
 }

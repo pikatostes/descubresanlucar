@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $ownerPlaces = [];
         if ($user->role === 'owner') {
             $ownerPlaces = $user->places()
-                ->with(['category', 'tags:id'])
+                ->with(['category', 'tags:id', 'images', 'primaryImage'])
                 ->latest()
                 ->get();
         }
