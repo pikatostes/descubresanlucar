@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { useState } from 'react';
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 import { getCategoryColor } from '@/utils/filterUtils';
@@ -8,6 +9,29 @@ export default function PlaceShow({ auth, place }) {
     const bgColor = getCategoryColor(place.category);
     const stars = Array.from({ length: 5 }, (_, i) => i < Math.round(place.rating || 0));
     const mainImage = place.image ?? place.images?.[0]?.url ?? null;
+    const [galleryIndex, setGalleryIndex] = useState(0);
+
+    const galleryImages = place.gallery ?? [];
+
+    const goToPreviousImage = () => {
+        setGalleryIndex((currentIndex) => {
+            if (galleryImages.length === 0) {
+                return 0;
+            }
+
+            return (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+        });
+    };
+
+    const goToNextImage = () => {
+        setGalleryIndex((currentIndex) => {
+            if (galleryImages.length === 0) {
+                return 0;
+            }
+
+            return (currentIndex + 1) % galleryImages.length;
+        });
+    };
 
     return (
         <>
@@ -70,14 +94,49 @@ export default function PlaceShow({ auth, place }) {
                                 </section>
                             )}
 
-                            {place.gallery && place.gallery.length > 0 && (
+                            {galleryImages.length > 0 && (
                                 <section className="place-section">
                                     <h2 className="place-section__title">Galería</h2>
-                                    <div className="place-gallery">
-                                        {place.gallery.map((img, i) => (
-                                            <div key={i} className="place-gallery__item">
-                                                <img src={img} alt={`${place.name} ${i + 1}`} loading="lazy" />
-                                            </div>
+
+                                    <div className="place-gallery-carousel">
+                                        <button
+                                            type="button"
+                                            className="place-gallery-carousel__arrow"
+                                            onClick={goToPreviousImage}
+                                            aria-label="Imagen anterior"
+                                        >
+                                            &#8592;
+                                        </button>
+
+                                        <div className="place-gallery-carousel__viewport">
+                                            <img
+                                                src={galleryImages[galleryIndex]}
+                                                alt={`${place.name} ${galleryIndex + 1}`}
+                                                loading="lazy"
+                                                className="place-gallery-carousel__image"
+                                            />
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            className="place-gallery-carousel__arrow"
+                                            onClick={goToNextImage}
+                                            aria-label="Imagen siguiente"
+                                        >
+                                            &#8594;
+                                        </button>
+                                    </div>
+
+                                    <div className="place-gallery-carousel__dots" role="tablist" aria-label="Miniaturas de galería">
+                                        {galleryImages.map((_, i) => (
+                                            <button
+                                                key={i}
+                                                type="button"
+                                                role="tab"
+                                                aria-selected={galleryIndex === i}
+                                                className={`place-gallery-carousel__dot ${galleryIndex === i ? 'is-active' : ''}`}
+                                                onClick={() => setGalleryIndex(i)}
+                                            />
                                         ))}
                                     </div>
                                 </section>
