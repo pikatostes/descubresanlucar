@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getInitialFormValues, buildSubmitHandler, fetchAllTags } from '@/Utils/editPlaceUtils';
 
 export default function PlaceEditForm({ place, categories, onClose }) {
@@ -20,6 +20,31 @@ export default function PlaceEditForm({ place, categories, onClose }) {
     // 🔹 Filtrar por categoría seleccionada
     const filteredTags = tags.filter(tag => tag.category_id == data.category_id);
 
+    const selectedImagePreview = useMemo(() => {
+        if (!data.image) return null;
+
+        return URL.createObjectURL(data.image);
+    }, [data.image]);
+
+    useEffect(() => {
+        return () => {
+            if (selectedImagePreview) {
+                URL.revokeObjectURL(selectedImagePreview);
+            }
+        };
+    }, [selectedImagePreview]);
+
+    const imageFields = useMemo(() => {
+        return [
+            {
+                id: 'image',
+                label: 'Imagen principal',
+                existingImage: place?.image ?? null,
+                previewImage: selectedImagePreview,
+            },
+        ];
+    }, [place?.image, selectedImagePreview]);
+
     // 🔹 Manejar selección de tags
     const toggleTag = (tagId) => {
         const normalizedTagId = Number(tagId);
@@ -34,169 +59,179 @@ export default function PlaceEditForm({ place, categories, onClose }) {
     return (
         <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
 
-            {/* Nombre */}
-            <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                    Nombre del negocio
-                </label>
-                <input
-                    type="text"
-                    value={data.name}
-                    onChange={e => setData('name', e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
-                />
-                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-            </div>
+            <div className="space-y-4 lg:grid lg:grid-cols-[260px_1fr] lg:gap-6 lg:space-y-0">
+                <div className="space-y-4 lg:order-2">
+                    {/* Nombre */}
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                            Nombre del negocio
+                        </label>
+                        <input
+                            type="text"
+                            value={data.name}
+                            onChange={e => setData('name', e.target.value)}
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
+                        />
+                        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                    </div>
 
-            {/* Categoría */}
-            {categories && categories.length > 0 && (
-                <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                        Categoría
-                    </label>
-                    <select
-                        value={data.category_id}
-                        onChange={e => {
-                            setData('category_id', e.target.value);
-                            setData('tags', []);
-                        }}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition bg-white"
-                    >
-                        <option value="">Sin categoría</option>
-                        {categories.map(cat => (
-                            <option key={cat.id} value={cat.id}>{cat.label}</option>
-                        ))}
-                    </select>
-                    {errors.category_id && <p className="text-red-500 text-xs mt-1">{errors.category_id}</p>}
-                </div>
-            )}
-
-            {/* Tags dinámicos */}
-            {data.category_id && (
-                <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                        Tags
-                    </label>
-
-                    {filteredTags.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                            {filteredTags.map(tag => {
-                                const isSelected = data.tags.includes(tag.id);
-
-                                return (
-                                    <button
-                                        type="button"
-                                        key={tag.id}
-                                        onClick={() => toggleTag(tag.id)}
-                                        className={`px-3 py-1 text-xs rounded-full border transition
-                                            ${isSelected
-                                                ? 'bg-amber-500 text-white border-amber-500'
-                                                : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200'
-                                            }`}
-                                    >
-                                        {tag.name}
-                                    </button>
-                                );
-                            })}
+                    {/* Categoría */}
+                    {categories && categories.length > 0 && (
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                                Categoría
+                            </label>
+                            <select
+                                value={data.category_id}
+                                onChange={e => {
+                                    setData('category_id', e.target.value);
+                                    setData('tags', []);
+                                }}
+                                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition bg-white"
+                            >
+                                <option value="">Sin categoría</option>
+                                {categories.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.label}</option>
+                                ))}
+                            </select>
+                            {errors.category_id && <p className="text-red-500 text-xs mt-1">{errors.category_id}</p>}
                         </div>
-                    ) : (
-                        <p className="text-xs text-gray-400">No hay tags para esta categoría</p>
                     )}
 
-                    {errors.tags && <p className="text-red-500 text-xs mt-1">{errors.tags}</p>}
-                </div>
-            )}
+                    {/* Tags dinámicos */}
+                    {data.category_id && (
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                                Tags
+                            </label>
 
-            {/* Descripción */}
-            <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                    Descripción
-                </label>
-                <textarea
-                    value={data.description}
-                    onChange={e => setData('description', e.target.value)}
-                    rows={3}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition resize-none"
-                />
-                {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
-            </div>
+                            {filteredTags.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                    {filteredTags.map(tag => {
+                                        const isSelected = data.tags.includes(tag.id);
 
-            {/* Dirección + Teléfono */}
-            <div className="grid grid-cols-2 gap-3">
-                <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                        Dirección
-                    </label>
-                    <input
-                        type="text"
-                        value={data.address}
-                        onChange={e => setData('address', e.target.value)}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
-                    />
-                    {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
-                </div>
-                <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                        Teléfono
-                    </label>
-                    <input
-                        type="text"
-                        value={data.phone}
-                        onChange={e => setData('phone', e.target.value)}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
-                    />
-                    {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-                </div>
-            </div>
+                                        return (
+                                            <button
+                                                type="button"
+                                                key={tag.id}
+                                                onClick={() => toggleTag(tag.id)}
+                                                className={`px-3 py-1 text-xs rounded-full border transition
+                                                    ${isSelected
+                                                        ? 'bg-amber-500 text-white border-amber-500'
+                                                        : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200'
+                                                    }`}
+                                            >
+                                                {tag.name}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <p className="text-xs text-gray-400">No hay tags para esta categoría</p>
+                            )}
 
-            {/* Horario */}
-            <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                    Horario
-                </label>
-                <input
-                    type="text"
-                    value={data.hours}
-                    onChange={e => setData('hours', e.target.value)}
-                    placeholder="Ej: Lun–Vie 09:00–20:00"
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
-                />
-                {errors.hours && <p className="text-red-500 text-xs mt-1">{errors.hours}</p>}
-            </div>
+                            {errors.tags && <p className="text-red-500 text-xs mt-1">{errors.tags}</p>}
+                        </div>
+                    )}
 
-            {/* Imagen */}
-            <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                    Imagen del negocio
-                </label>
-
-                {place?.image && !data.image && (
-                    <div className="mb-2">
-                        <img
-                            src={`${place.image}`}
-                            alt="Imagen actual"
-                            className="h-24 w-auto rounded-lg object-cover border border-gray-200"
+                    {/* Descripción */}
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                            Descripción
+                        </label>
+                        <textarea
+                            value={data.description}
+                            onChange={e => setData('description', e.target.value)}
+                            rows={3}
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition resize-none"
                         />
+                        {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
                     </div>
-                )}
 
-                {data.image && (
-                    <div className="mb-2">
-                        <img
-                            src={URL.createObjectURL(data.image)}
-                            alt="Nueva imagen"
-                            className="h-24 w-auto rounded-lg object-cover border border-amber-300"
+                    {/* Dirección + Teléfono */}
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                                Dirección
+                            </label>
+                            <input
+                                type="text"
+                                value={data.address}
+                                onChange={e => setData('address', e.target.value)}
+                                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
+                            />
+                            {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                                Teléfono
+                            </label>
+                            <input
+                                type="text"
+                                value={data.phone}
+                                onChange={e => setData('phone', e.target.value)}
+                                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
+                            />
+                            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                        </div>
+                    </div>
+
+                    {/* Horario */}
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                            Horario
+                        </label>
+                        <input
+                            type="text"
+                            value={data.hours}
+                            onChange={e => setData('hours', e.target.value)}
+                            placeholder="Ej: Lun–Vie 09:00–20:00"
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
                         />
+                        {errors.hours && <p className="text-red-500 text-xs mt-1">{errors.hours}</p>}
                     </div>
-                )}
+                </div>
 
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={e => setData('image', e.target.files[0] ?? null)}
-                    className="w-full text-sm text-gray-600"
-                />
-                {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
+                <div className="space-y-3 lg:order-1 lg:sticky lg:top-0 lg:self-start">
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        Imágenes del negocio
+                    </label>
+
+                    {imageFields.map((imageField) => {
+                        return (
+                            <div key={imageField.id} className="rounded-xl border border-gray-200 p-3 space-y-3">
+                                <p className="text-xs font-medium text-gray-500">{imageField.label}</p>
+
+                                <div className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center">
+                                    {imageField.previewImage ? (
+                                        <img
+                                            src={imageField.previewImage}
+                                            alt={`Nueva ${imageField.label.toLowerCase()}`}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : imageField.existingImage ? (
+                                        <img
+                                            src={imageField.existingImage}
+                                            alt={`Actual ${imageField.label.toLowerCase()}`}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : (
+                                        <span className="text-xs text-gray-400 px-3 text-center">Sin imagen seleccionada</span>
+                                    )}
+                                </div>
+
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={e => setData('image', e.target.files[0] ?? null)}
+                                    className="w-full text-sm text-gray-600"
+                                />
+                            </div>
+                        );
+                    })}
+
+                    {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
+                </div>
             </div>
 
             {/* Acciones */}
