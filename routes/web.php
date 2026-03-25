@@ -1,18 +1,23 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\OwnerPlaceController;
 use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\WelcomeController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', [WelcomeController::class, 'index']);
+
+// Páginas legales
+Route::get('/privacidad', fn () => Inertia::render('Privacidad'))->name('privacidad');
+Route::get('/terminos', fn () => Inertia::render('Terminos'))->name('terminos');
+Route::get('/contacto', fn () => Inertia::render('Contacto'))->name('contacto');
 
 Route::get('/lugares/{place}', [PlaceController::class, 'show'])->name('places.show');
 
@@ -44,4 +49,4 @@ Route::middleware('auth')->group(function () {
         ->name('likes.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
