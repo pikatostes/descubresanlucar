@@ -19,6 +19,7 @@ export function getInitialFormValues(place) {
         hours:       place?.hours       ?? '',
         category_id: place?.category_id ?? '',
         images:      [],
+        deleted_image_ids: [],
     };
 }
 

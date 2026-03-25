@@ -96,6 +96,7 @@ function PlaceCard({ place, onEdit }) {
 export default function Dashboard({ ownerPlaces = [], categories = [] }) {
     const { auth } = usePage().props;
     const isOwner = auth.user?.role === 'owner';
+    const isAdmin = auth.user?.role === 'admin';
     const user = auth.user;
 
     const [editingPlace, setEditingPlace] = useState(null);
@@ -193,6 +194,20 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
                                         <div className="text-5xl mb-3 opacity-20">🔐</div>
                                         <p className="text-sm">No tienes permisos de propietario.</p>
                                         <p className="text-xs mt-1">Contacta con el administrador para obtener acceso.</p>
+                                    </div>
+                                </div>
+                            )}
+                            {isAdmin && (
+                                <div className="bg-white shadow-sm rounded-xl overflow-hidden">
+                                    <div className="p-12 text-center text-gray-400">
+                                        <div className="text-5xl mb-3 opacity-20">👑</div>
+                                        <button
+                                            onClick={() => window.location.href = '/admin'}
+                                            className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg transition"
+                                        >
+                                            <IconPlus />
+                                            Administrar
+                                        </button>
                                     </div>
                                 </div>
                             )}

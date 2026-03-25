@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rule;
 
 class OwnerPlaceController extends Controller
@@ -34,7 +36,8 @@ class OwnerPlaceController extends Controller
             $place = $request->user()->places()->create(Arr::except($validated, ['tags', 'images']));
             $place->tags()->sync($validated['tags'] ?? []);
 
-            $this->storeUploadedImages($place, $request->file('images', []));
+            $uploadedImages = array_values(array_filter(Arr::wrap($request->file('images'))));
+            $this->storeUploadedImages($place, $uploadedImages);
         });
 
         return redirect()->route('dashboard')->with('success', 'Negocio creado correctamente.');
@@ -57,16 +60,36 @@ class OwnerPlaceController extends Controller
             )],
             'images'      => 'nullable|array',
             'images.*'    => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'deleted_image_ids' => 'nullable|array',
+            'deleted_image_ids.*' => [
+                'integer',
+                Rule::exists('place_images', 'id')->where(
+                    fn ($query) => $query->where('place_id', $place->id)
+                ),
+            ],
         ]);
 
-        DB::transaction(function () use ($request, $validated, $place): void {
-            $place->update(Arr::except($validated, ['tags', 'images']));
+        $deletedImageIds = array_values(array_unique($validated['deleted_image_ids'] ?? []));
+        $uploadedImages = array_values(array_filter(Arr::wrap($request->file('images'))));
+
+        $remainingImages = $place->images()->count() - count($deletedImageIds) + count($uploadedImages);
+        if ($remainingImages < 1) {
+            throw ValidationException::withMessages([
+                'deleted_image_ids' => 'El negocio debe tener al menos una imagen.',
+            ]);
+        }
+
+        DB::transaction(function () use ($validated, $place, $uploadedImages): void {
+            $place->update(Arr::except($validated, ['tags', 'images', 'deleted_image_ids']));
             $place->tags()->sync($validated['tags'] ?? []);
 
-            $uploadedImages = $request->file('images', []);
+            $this->deletePlaceImages($place, $validated['deleted_image_ids'] ?? []);
+
             if (!empty($uploadedImages)) {
                 $this->storeUploadedImages($place, $uploadedImages);
             }
+
+            $this->ensurePrimaryImage($place);
         });
 
         return back()->with('success', 'Negocio actualizado correctamente.');
@@ -109,6 +132,23 @@ class OwnerPlaceController extends Controller
 
         if ($firstImage instanceof PlaceImage) {
             $firstImage->update(['is_primary' => true]);
+        }
+    }
+
+    /**
+     * @param  array<int, int>  $deletedImageIds
+     */
+    private function deletePlaceImages(Places $place, array $deletedImageIds): void
+    {
+        if (empty($deletedImageIds)) {
+            return;
+        }
+
+        $imagesToDelete = $place->images()->whereIn('id', $deletedImageIds)->get();
+
+        foreach ($imagesToDelete as $image) {
+            Storage::disk('public')->delete($image->path);
+            $image->delete();
         }
     }
 }

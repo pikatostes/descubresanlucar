@@ -42,6 +42,28 @@ export default function PlaceEditForm({ place, categories, onClose }) {
         return place.images;
     }, [place]);
 
+    const visibleExistingImages = useMemo(() => {
+        if (!Array.isArray(data.deleted_image_ids) || data.deleted_image_ids.length === 0) {
+            return existingImages;
+        }
+
+        return existingImages.filter((existingImage) => {
+            return !data.deleted_image_ids.includes(Number(existingImage.id));
+        });
+    }, [existingImages, data.deleted_image_ids]);
+
+    const markExistingImageForDeletion = (imageId) => {
+        if (!Number.isInteger(imageId)) {
+            return;
+        }
+
+        if (data.deleted_image_ids.includes(imageId)) {
+            return;
+        }
+
+        setData('deleted_image_ids', [...data.deleted_image_ids, imageId]);
+    };
+
     // 🔹 Manejar selección de tags
     const toggleTag = (tagId) => {
         const normalizedTagId = Number(tagId);
@@ -197,34 +219,69 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                     <div className="rounded-xl border border-gray-200 p-3 space-y-3">
                         <p className="text-xs font-medium text-gray-500">Imágenes del negocio</p>
 
-                        {selectedImagePreviews.length > 0 ? (
-                            <div className="grid grid-cols-2 gap-2">
-                                {selectedImagePreviews.map((previewUrl, index) => (
-                                    <div key={`new-image-${index}`} className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 border border-dashed border-gray-300">
-                                        <img
-                                            src={previewUrl}
-                                            alt={`Nueva imagen ${index + 1}`}
-                                            className="h-full w-full object-cover"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        ) : existingImages.length > 0 ? (
-                            <div className="grid grid-cols-2 gap-2">
-                                {existingImages.map((existingImage, index) => (
-                                    <div key={existingImage.id ?? `existing-image-${index}`} className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 border border-dashed border-gray-300">
-                                        <img
-                                            src={existingImage.url}
-                                            alt={`Imagen actual ${index + 1}`}
-                                            className="h-full w-full object-cover"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
+                        {visibleExistingImages.length > 0 && (
+                            <>
+                                <p className="text-xs font-medium text-gray-500">Imágenes actuales</p>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {visibleExistingImages.map((existingImage, index) => {
+                                        const numericImageId = Number(existingImage.id);
+                                        const canDelete = Number.isInteger(numericImageId);
+
+                                        return (
+                                            <div
+                                                key={existingImage.id ?? `existing-image-${index}`}
+                                                className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 border border-dashed border-gray-300"
+                                            >
+                                                {canDelete && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => markExistingImageForDeletion(numericImageId)}
+                                                        className="absolute top-1.5 right-1.5 z-10 h-6 w-6 rounded-full bg-black/70 text-white text-sm leading-none flex items-center justify-center hover:bg-black"
+                                                        aria-label={`Eliminar imagen ${index + 1}`}
+                                                    >
+                                                        ×
+                                                    </button>
+                                                )}
+
+                                                <img
+                                                    src={existingImage.url}
+                                                    alt={`Imagen actual ${index + 1}`}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </>
+                        )}
+
+                        {selectedImagePreviews.length > 0 && (
+                            <>
+                                <p className="text-xs font-medium text-gray-500">Nuevas imágenes</p>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {selectedImagePreviews.map((previewUrl, index) => (
+                                        <div key={`new-image-${index}`} className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 border border-dashed border-gray-300">
+                                            <img
+                                                src={previewUrl}
+                                                alt={`Nueva imagen ${index + 1}`}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+
+                        {visibleExistingImages.length === 0 && selectedImagePreviews.length === 0 && (
                             <div className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center">
                                 <span className="text-xs text-gray-400 px-3 text-center">Sin imagen seleccionada</span>
                             </div>
+                        )}
+
+                        {data.deleted_image_ids.length > 0 && (
+                            <p className="text-xs text-amber-600">
+                                {data.deleted_image_ids.length} imagen(es) se eliminarán al guardar cambios.
+                            </p>
                         )}
 
                         <input
@@ -238,6 +295,7 @@ export default function PlaceEditForm({ place, categories, onClose }) {
 
                     {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
                     {errors['images.0'] && <p className="text-red-500 text-xs mt-1">{errors['images.0']}</p>}
+                    {errors.deleted_image_ids && <p className="text-red-500 text-xs mt-1">{errors.deleted_image_ids}</p>}
                 </div>
             </div>
 
