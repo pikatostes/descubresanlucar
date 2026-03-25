@@ -4,7 +4,6 @@ import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 import PlaceCard from '../Components/PlaceCard';
 import ExploreSearchBar from '../Components/ExploreSearchBar';
-import '../../css/Explore.css';
 
 export default function Explore({ auth, categories = [], places = [], selectedCategory = null, search = '' }) {
     const [openCategories, setOpenCategories] = useState([]);
@@ -223,7 +222,7 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
 
     return (
         <>
-            <Head title="Explorar — DescubreSanlúcar" />
+            <Head title="DescubreSanlúcar — Explorar" />
 
             <div className="page-root">
                 <Navbar auth={auth} />

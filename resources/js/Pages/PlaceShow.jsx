@@ -3,7 +3,6 @@ import { useState } from 'react';
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 import { getCategoryColor } from '@/utils/filterUtils';
-import '../../css/PlaceShow.css';
 
 export default function PlaceShow({ auth, place }) {
     const bgColor = getCategoryColor(place.category);

@@ -1,7 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
-import '../../css/Legal.css';
 
 export default function Terminos({ auth }) {
     const footerSections = [

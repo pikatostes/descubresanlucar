@@ -1,6 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
-import '../../css/Navbar.css';
 
 export default function Navbar({ auth }) {
     const [menuOpen, setMenuOpen] = useState(false);

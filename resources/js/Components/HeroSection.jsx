@@ -1,5 +1,4 @@
 import bgImage from '../../assets/images/sanlucar.webp';
-import '../../css/HeroSection.css';
 
 export default function HeroSection({ onSearch, searchValue, onSearchChange }) {
     return (

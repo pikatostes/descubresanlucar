@@ -8,7 +8,6 @@ import FilterBar from '../Components/FilterBar';
 import PlaceCard from '../Components/PlaceCard';
 import OwnerCTA from '../Components/OwnerCTA';
 import { filterAndSortPlaces } from '../utils/FilterUtils';
-import '../../css/Welcome.css';
 
 export default function Welcome({ auth, places = [], categories = [] }) {
     const [activeCategory, setActiveCategory] = useState('all');

@@ -1,4 +1,13 @@
 import '../css/app.css';
+import '../css/Navbar.css';
+import '../css/Footer.css';
+import '../css/Welcome.css';
+import '../css/Explore.css';
+import '../css/CategoryIndex.css';
+import '../css/PlaceShow.css';
+import '../css/HeroSection.css';
+import '../css/tags.css';
+import '../css/Legal.css';
 import './bootstrap';
 
 import { createInertiaApp } from '@inertiajs/react';

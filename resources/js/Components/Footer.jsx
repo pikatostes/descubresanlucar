@@ -1,5 +1,4 @@
 import { Link } from '@inertiajs/react';
-import '../../css/Footer.css';
 
 export default function Footer({ sections = [] }) {
     return (
