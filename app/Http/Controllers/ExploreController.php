@@ -13,21 +13,17 @@ class ExploreController extends Controller
     {
         $categoryId = $request->query('category');
         $search = trim((string) $request->query('search', ''));
-        
+
         $categories = Category::with('tags')->orderBy('label')->get();
-        
+
         $placesQuery = Places::with('category', 'tags', 'images', 'primaryImage');
-        
-        if ($categoryId) {
-            $placesQuery->where('category_id', $categoryId);
-        }
 
         if ($search !== '') {
-            $placesQuery->where('name', 'like', '%' . $search . '%');
+            $placesQuery->where('name', 'like', '%'.$search.'%');
         }
-        
+
         $places = $placesQuery->latest()->get();
-        
+
         return Inertia::render('Explore', [
             'categories' => $categories,
             'places' => $places,
