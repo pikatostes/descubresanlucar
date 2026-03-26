@@ -1,7 +1,9 @@
 import { Link } from '@inertiajs/react';
+import { useState } from 'react';
 import { getCategoryColor } from '@/utils/filterUtils';
 
 export default function PlaceCard({ place }) {
+    const [liked, setLiked] = useState(false);
     const bgColor = getCategoryColor(place.category);
     const mainImage = place.image ?? place.images?.[0]?.url ?? null;
 
@@ -17,6 +19,21 @@ export default function PlaceCard({ place }) {
                     </div>
                 )}
                 <div className="card-category-tag">{place.category?.label}</div>
+                <button 
+                    className={`favorite-btn ${liked ? 'liked' : ''}`}
+                    onClick={() => setLiked(!liked)}
+                    aria-label={liked ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                >
+                    <svg 
+                        className="heart-icon" 
+                        viewBox="0 0 24 24" 
+                        fill={liked ? '#e74c3c' : 'none'}
+                        stroke={liked ? '#e74c3c' : '#fff'}
+                        strokeWidth="2"
+                    >
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                </button>
             </div>
 
             {/* Contenido */}

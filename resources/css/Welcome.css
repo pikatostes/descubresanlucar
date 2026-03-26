@@ -449,6 +449,44 @@
 }
 .placeholder-icon { font-size: 3.5rem; opacity: 0.6; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
 
+.favorite-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.4);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, background 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+.favorite-btn:hover {
+    background: rgba(0, 0, 0, 0.6);
+    transform: scale(1.1);
+}
+.favorite-btn:active {
+    transform: scale(0.95);
+}
+.heart-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.favorite-btn.liked .heart-icon {
+    transform: scale(1.2);
+    animation: heartPop 0.3s ease forwards;
+}
+@keyframes heartPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
 .featured-badge {
     position: absolute;
     top: 12px;
