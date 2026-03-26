@@ -8,7 +8,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class CategoriesStatsWidget extends BaseWidget
 {
-    protected int | string | array $columnSpan = [
+    protected int|string|array $columnSpan = [
         'md' => 1,
         'xl' => 1,
     ];
@@ -16,7 +16,7 @@ class CategoriesStatsWidget extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Total Categories', Category::count())
+            Stat::make('Total Categories', cache()->remember('categories_count', 300, fn () => Category::count()))
                 ->description('Categorías disponibles')
                 ->icon('heroicon-o-folder'),
         ];

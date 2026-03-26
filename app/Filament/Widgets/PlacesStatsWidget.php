@@ -8,7 +8,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class PlacesStatsWidget extends BaseWidget
 {
-    protected int | string | array $columnSpan = [
+    protected int|string|array $columnSpan = [
         'md' => 1,
         'xl' => 1,
     ];
@@ -16,7 +16,7 @@ class PlacesStatsWidget extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Total Places', Places::count())
+            Stat::make('Total Places', cache()->remember('places_count', 300, fn () => Places::count()))
                 ->description('Lugares registrados')
                 ->icon('heroicon-o-map-pin'),
         ];

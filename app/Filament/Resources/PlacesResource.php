@@ -3,17 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PlacesResource\Pages;
-use App\Filament\Resources\PlacesResource\RelationManagers;
 use App\Models\Category;
-use App\Models\Tag;
 use App\Models\Places;
+use App\Models\Tag;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PlacesResource extends Resource
 {
@@ -21,13 +18,20 @@ class PlacesResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['category', 'primaryImage', 'images']);
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Select::make('category_id')
                     ->label('Category')
-                    ->options(Category::all()->pluck('label', 'id'))
+                    ->options(fn () => Category::all()->pluck('label', 'id'))
+                    ->searchable()
                     ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
@@ -68,7 +72,8 @@ class PlacesResource extends Resource
                 Forms\Components\Select::make('tags')
                     ->relationship('tags', 'name')
                     ->multiple()
-                    ->options(Tag::query()->orderBy('name')->pluck('name', 'id'))
+                    ->options(fn () => Tag::query()->orderBy('name')->pluck('name', 'id'))
+                    ->searchable()
                     ->columnSpanFull(),
             ]);
     }
@@ -79,7 +84,8 @@ class PlacesResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('category.label')
                     ->label('Category')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('address')
@@ -89,7 +95,8 @@ class PlacesResource extends Resource
                 Tables\Columns\TextColumn::make('hours')
                     ->searchable(),
                 Tables\Columns\ImageColumn::make('primaryImage.path')
-                    ->disk('public'),
+                    ->disk('public')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

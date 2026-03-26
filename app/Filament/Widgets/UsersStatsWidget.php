@@ -8,7 +8,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class UsersStatsWidget extends BaseWidget
 {
-    protected int | string | array $columnSpan = [
+    protected int|string|array $columnSpan = [
         'md' => 1,
         'xl' => 1,
     ];
@@ -16,7 +16,7 @@ class UsersStatsWidget extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Total Users', User::count())
+            Stat::make('Total Users', cache()->remember('users_count', 300, fn () => User::count()))
                 ->description('Usuarios registrados')
                 ->icon('heroicon-o-users'),
         ];

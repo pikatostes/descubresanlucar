@@ -8,7 +8,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class TagsStatsWidget extends BaseWidget
 {
-    protected int | string | array $columnSpan = [
+    protected int|string|array $columnSpan = [
         'md' => 1,
         'xl' => 1,
     ];
@@ -16,7 +16,7 @@ class TagsStatsWidget extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Total Tags', Tag::count())
+            Stat::make('Total Tags', cache()->remember('tags_count', 300, fn () => Tag::count()))
                 ->description('Etiquetas disponibles')
                 ->icon('heroicon-o-tag'),
         ];
