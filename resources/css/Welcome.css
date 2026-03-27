@@ -453,21 +453,23 @@
     position: absolute;
     top: 12px;
     right: 12px;
-    width: 36px;
+    min-width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: 18px;
     background: rgba(0, 0, 0, 0.4);
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 4px;
+    padding: 0 8px;
     transition: transform 0.2s ease, background 0.2s ease;
     backdrop-filter: blur(4px);
 }
 .favorite-btn:hover {
     background: rgba(0, 0, 0, 0.6);
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 .favorite-btn:active {
     transform: scale(0.95);
@@ -475,16 +477,22 @@
 .heart-icon {
     width: 20px;
     height: 20px;
+    flex-shrink: 0;
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .favorite-btn.liked .heart-icon {
-    transform: scale(1.2);
     animation: heartPop 0.3s ease forwards;
 }
 @keyframes heartPop {
     0% { transform: scale(1); }
     50% { transform: scale(1.3); }
     100% { transform: scale(1); }
+}
+.like-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1;
 }
 
 .featured-badge {
@@ -943,4 +951,59 @@
 
 .place-card {
     animation: fadeUp 0.5s ease both;
+}
+
+/* ── Dashboard Tabs ──────────────────────────────────── */
+.dash-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-mid);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    position: relative;
+}
+.dash-tab:hover {
+    color: var(--terracotta);
+}
+.dash-tab--active {
+    color: var(--terracotta);
+    border-bottom-color: var(--terracotta);
+}
+.dash-tab__badge {
+    background: var(--terracotta);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    min-width: 18px;
+    text-align: center;
+    line-height: 1.3;
+}
+
+/* ── Dashboard Filter ────────────────────────────────── */
+.dash-filter {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    outline: none;
+    background: #f9fafb;
+    width: 220px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.dash-filter:focus {
+    border-color: var(--ochre);
+    box-shadow: 0 0 0 3px rgba(212, 136, 31, 0.15);
+    background: #fff;
+}
+.dash-filter::placeholder {
+    color: #9ca3af;
 }

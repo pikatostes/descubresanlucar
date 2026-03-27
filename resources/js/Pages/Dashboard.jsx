@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Footer from '@/Components/Footer';
 import PlaceEditModal from '@/Components/PlaceEditModal';
+import PlaceCard from '@/Components/PlaceCard';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -33,7 +34,17 @@ function IconPlus() {
     );
 }
 
-function PlaceCard({ place, onEdit }) {
+function IconHeart() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+    );
+}
+
+function OwnerPlaceCard({ place, onEdit }) {
     const mainImage = place.image ?? place.images?.[0]?.url ?? null;
 
     return (
@@ -93,7 +104,7 @@ function PlaceCard({ place, onEdit }) {
     );
 }
 
-export default function Dashboard({ ownerPlaces = [], categories = [] }) {
+export default function Dashboard({ ownerPlaces = [], likedPlaces = [], categories = [] }) {
     const { auth } = usePage().props;
     const isOwner = auth.user?.role === 'owner';
     const isAdmin = auth.user?.role === 'admin';
@@ -101,7 +112,24 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
 
     const [editingPlace, setEditingPlace] = useState(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
-    console.log(user)
+    const [activeTab, setActiveTab] = useState('negocios');
+    const [likedFilter, setLikedFilter] = useState('');
+
+    const filteredLikedPlaces = likedPlaces.filter(place => {
+        if (!likedFilter) return true;
+        const search = likedFilter.toLowerCase();
+        return (
+            place.name?.toLowerCase().includes(search) ||
+            place.category?.label?.toLowerCase().includes(search) ||
+            place.address?.toLowerCase().includes(search)
+        );
+    });
+
+    const likedCategories = [...new Set(
+        likedPlaces
+            .map(p => p.category?.label)
+            .filter(Boolean)
+    )].sort();
 
     return (
         <AuthenticatedLayout
@@ -117,7 +145,7 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-                        {/* Columna izquierda (30%) — Perfil del usuario */}
+                        {/* Columna izquierda — Perfil */}
                         <div className="lg:col-span-1">
                             <div className="bg-white shadow-sm rounded-xl overflow-hidden">
                                 <div className="p-6 text-center">
@@ -138,79 +166,177 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
                             </div>
                         </div>
 
-                        {/* Columna derecha (70%) — Negocios del owner */}
+                        {/* Columna derecha — Contenido con tabs */}
                         <div className="lg:col-span-4">
-                            {isOwner && (
-                                <div className="bg-white shadow-sm sm:rounded-xl overflow-hidden">
-                                    <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600">
+                            <div className="bg-white shadow-sm sm:rounded-xl overflow-hidden">
+                                {/* Tabs */}
+                                <div className="border-b border-gray-100">
+                                    <nav className="flex">
+                                        {isOwner && (
+                                            <button
+                                                onClick={() => setActiveTab('negocios')}
+                                                className={`dash-tab ${activeTab === 'negocios' ? 'dash-tab--active' : ''}`}
+                                            >
                                                 <IconStore />
-                                            </div>
+                                                Mis negocios
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => setActiveTab('likes')}
+                                            className={`dash-tab ${activeTab === 'likes' ? 'dash-tab--active' : ''}`}
+                                        >
+                                            <IconHeart />
+                                            Favoritos
+                                            {likedPlaces.length > 0 && (
+                                                <span className="dash-tab__badge">{likedPlaces.length}</span>
+                                            )}
+                                        </button>
+                                        {isAdmin && (
+                                            <button
+                                                onClick={() => setActiveTab('admin')}
+                                                className={`dash-tab ${activeTab === 'admin' ? 'dash-tab--active' : ''}`}
+                                            >
+                                                👑 Admin
+                                            </button>
+                                        )}
+                                    </nav>
+                                </div>
+
+                                {/* Tab: Negocios */}
+                                {activeTab === 'negocios' && isOwner && (
+                                    <div>
+                                        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                                             <div>
                                                 <h3 className="font-semibold text-gray-800">Mis negocios</h3>
                                                 <p className="text-xs text-gray-400">
                                                     {ownerPlaces.length === 0
                                                         ? 'No tienes negocios registrados'
-                                                        : `${ownerPlaces.length} negocio${ownerPlaces.length > 1 ? 's' : ''} registrado${ownerPlaces.length > 1 ? 's' : ''}`
+                                                        : `${ownerPlaces.length} negocio${ownerPlaces.length > 1 ? 's' : ''}`
                                                     }
                                                 </p>
                                             </div>
+                                            <button
+                                                onClick={() => setShowCreateModal(true)}
+                                                className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg transition"
+                                            >
+                                                <IconPlus />
+                                                Añadir negocio
+                                            </button>
                                         </div>
-                                        <button
-                                            onClick={() => setShowCreateModal(true)}
-                                            className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg transition"
-                                        >
-                                            <IconPlus />
-                                            Añadir negocio
-                                        </button>
+                                        <div className="p-6">
+                                            {ownerPlaces.length === 0 ? (
+                                                <div className="text-center py-12 text-gray-400">
+                                                    <div className="text-5xl mb-3 opacity-20">🏪</div>
+                                                    <p className="text-sm">Aún no tienes negocios asociados.</p>
+                                                    <p className="text-xs mt-1">Haz clic en "Añadir negocio" para crear el primero.</p>
+                                                </div>
+                                            ) : (
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                    {ownerPlaces.map(place => (
+                                                        <OwnerPlaceCard
+                                                            key={place.id}
+                                                            place={place}
+                                                            onEdit={setEditingPlace}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
+                                )}
 
-                                    <div className="p-6">
-                                        {ownerPlaces.length === 0 ? (
-                                            <div className="text-center py-12 text-gray-400">
-                                                <div className="text-5xl mb-3 opacity-20">🏪</div>
-                                                <p className="text-sm">Aún no tienes negocios asociados.</p>
-                                                <p className="text-xs mt-1">Haz clic en "Añadir negocio" para crear el primero.</p>
+                                {/* Tab: Favoritos */}
+                                {activeTab === 'likes' && (
+                                    <div>
+                                        <div className="px-6 py-4 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
+                                            <div>
+                                                <h3 className="font-semibold text-gray-800">Lugares favoritos</h3>
+                                                <p className="text-xs text-gray-400">
+                                                    {likedPlaces.length === 0
+                                                        ? 'No has guardado ningún lugar'
+                                                        : `${filteredLikedPlaces.length} de ${likedPlaces.length} favorito${likedPlaces.length > 1 ? 's' : ''}`
+                                                    }
+                                                </p>
                                             </div>
-                                        ) : (
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                                {ownerPlaces.map(place => (
-                                                    <PlaceCard
-                                                        key={place.id}
-                                                        place={place}
-                                                        onEdit={setEditingPlace}
+                                            {likedPlaces.length > 0 && (
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="text"
+                                                        value={likedFilter}
+                                                        onChange={e => setLikedFilter(e.target.value)}
+                                                        placeholder="Buscar en favoritos..."
+                                                        className="dash-filter"
                                                     />
-                                                ))}
-                                            </div>
-                                        )}
+                                                    {likedFilter && (
+                                                        <button
+                                                            onClick={() => setLikedFilter('')}
+                                                            className="text-xs text-gray-400 hover:text-gray-600"
+                                                        >
+                                                            Limpiar
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="p-6">
+                                            {likedPlaces.length === 0 ? (
+                                                <div className="text-center py-12 text-gray-400">
+                                                    <div className="text-5xl mb-3 opacity-20">❤️</div>
+                                                    <p className="text-sm">Aún no has guardado ningún lugar.</p>
+                                                    <p className="text-xs mt-1">
+                                                        Explora y haz clic en el corazón para guardar tus favoritos.
+                                                    </p>
+                                                    <Link
+                                                        href="/explorar"
+                                                        className="inline-block mt-4 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg transition"
+                                                    >
+                                                        Explorar lugares
+                                                    </Link>
+                                                </div>
+                                            ) : filteredLikedPlaces.length === 0 ? (
+                                                <div className="text-center py-12 text-gray-400">
+                                                    <p className="text-sm">No se encontraron resultados para "{likedFilter}".</p>
+                                                    <button
+                                                        onClick={() => setLikedFilter('')}
+                                                        className="mt-2 text-xs text-amber-600 hover:underline"
+                                                    >
+                                                        Limpiar filtro
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="places-grid">
+                                                    {filteredLikedPlaces.map(place => (
+                                                        <PlaceCard key={place.id} place={place} />
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
-                            {!isOwner && (
-                                <div className="bg-white shadow-sm rounded-xl overflow-hidden">
-                                    <div className="p-12 text-center text-gray-400">
-                                        <div className="text-5xl mb-3 opacity-20">🔐</div>
-                                        <p className="text-sm">No tienes permisos de propietario.</p>
-                                        <p className="text-xs mt-1">Contacta con el administrador para obtener acceso.</p>
-                                    </div>
-                                </div>
-                            )}
-                            {isAdmin && (
-                                <div className="bg-white shadow-sm rounded-xl overflow-hidden">
+                                {/* Tab: Admin */}
+                                {activeTab === 'admin' && isAdmin && (
                                     <div className="p-12 text-center text-gray-400">
                                         <div className="text-5xl mb-3 opacity-20">👑</div>
                                         <button
                                             onClick={() => window.location.href = '/admin'}
-                                            className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg transition"
+                                            className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg transition mx-auto"
                                         >
                                             <IconPlus />
                                             Administrar
                                         </button>
                                     </div>
-                                </div>
-                            )}
+                                )}
+
+                                {/* Sin pestaña activa */}
+                                {!isOwner && activeTab !== 'likes' && activeTab !== 'admin' && (
+                                    <div className="p-12 text-center text-gray-400">
+                                        <div className="text-5xl mb-3 opacity-20">🔐</div>
+                                        <p className="text-sm">No tienes permisos de propietario.</p>
+                                        <p className="text-xs mt-1">Contacta con el administrador para obtener acceso.</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -239,7 +365,7 @@ export default function Dashboard({ ownerPlaces = [], categories = [] }) {
                     {
                         title: 'Explorar',
                         links: [
-                            { label: 'Todos los lugares', href: '/lugares' },
+                            { label: 'Todos los lugares', href: '/' },
                             { label: 'Mapa interactivo', href: '/mapa' },
                             { label: 'Destacados', href: '/destacados' },
                         ],

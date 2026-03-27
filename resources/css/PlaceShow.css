@@ -94,6 +94,50 @@
     margin-left: 0.35rem;
 }
 
+/* like button */
+.place-hero__like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    padding: 0.5rem 1.25rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    width: fit-content;
+    transition: background 0.2s, transform 0.2s, border-color 0.2s;
+}
+.place-hero__like-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+.place-hero__like-btn:active {
+    transform: scale(0.95);
+}
+.place-hero__like-btn .heart-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.place-hero__like-btn.liked .heart-icon {
+    animation: heartPop 0.3s ease forwards;
+}
+.place-hero__like-btn.liked {
+    background: rgba(231, 76, 60, 0.25);
+    border-color: rgba(231, 76, 60, 0.5);
+}
+.place-hero__like-btn .like-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+}
+
 /* ── BODY LAYOUT ── */
 .place-body {
     display: grid;

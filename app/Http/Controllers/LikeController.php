@@ -2,26 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Places;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class LikeController extends Controller
 {
-    public function store(Request $request, Places $place): RedirectResponse
+    public function toggle(Request $request, Places $place): JsonResponse
     {
-        $request->user()->likes()->firstOrCreate([
-            'place_id' => $place->id,
+        $like = $request->user()->likes()
+            ->where('place_id', $place->id)
+            ->first();
+
+        if ($like) {
+            $like->delete();
+            $liked = false;
+        } else {
+            $request->user()->likes()->create(['place_id' => $place->id]);
+            $liked = true;
+        }
+
+        return response()->json([
+            'liked' => $liked,
+            'count' => $place->likes()->count(),
         ]);
-
-        return back()->with('success', 'Like agregado correctamente.');
-    }
-
-    public function destroy(Request $request, Places $place): RedirectResponse
-    {
-        $request->user()->likes()->where('place_id', $place->id)->delete();
-
-        return back()->with('success', 'Like eliminado correctamente.');
     }
 }

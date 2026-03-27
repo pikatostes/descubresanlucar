@@ -43,10 +43,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/owner/places/{place}', [OwnerPlaceController::class, 'update'])
         ->name('owner.places.update');
 
-    Route::post('/lugares/{place}/likes', [LikeController::class, 'store'])
-        ->name('likes.store');
-    Route::delete('/lugares/{place}/likes', [LikeController::class, 'destroy'])
-        ->name('likes.destroy');
+    Route::post('/lugares/{place}/likes', [LikeController::class, 'toggle'])
+        ->name('likes.toggle');
 });
 
 require __DIR__.'/auth.php';

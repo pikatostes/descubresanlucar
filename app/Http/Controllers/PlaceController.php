@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Places;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class PlaceController extends Controller
@@ -12,6 +11,8 @@ class PlaceController extends Controller
     public function show(Places $place)
     {
         $place->load(['category', 'tags', 'images', 'primaryImage']);
+        $place->loadCount('likes');
+        $userId = Auth::id();
 
         return Inertia::render('PlaceShow', [
             'place' => [
@@ -39,6 +40,8 @@ class PlaceController extends Controller
                 'email' => $place->email,
                 'website' => $place->website,
                 'price_range' => $place->price_range,
+                'likes_count' => $place->likes_count,
+                'is_liked' => $userId ? $place->likes()->where('user_id', $userId)->exists() : false,
             ],
         ]);
     }

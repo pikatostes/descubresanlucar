@@ -12,7 +12,6 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        // La tabla users tiene columna 'role' directa (varchar)
         $ownerPlaces = [];
         if ($user->role === 'owner') {
             $ownerPlaces = $user->places()
@@ -21,10 +20,35 @@ class DashboardController extends Controller
                 ->get();
         }
 
+        $likedPlaces = $user->likes()
+            ->with(['place.category', 'place.tags', 'place.images', 'place.primaryImage'])
+            ->with(['place' => fn ($q) => $q->withCount('likes')])
+            ->latest()
+            ->get()
+            ->map(fn ($like) => $like->place)
+            ->filter()
+            ->map(fn ($place) => [
+                'id' => $place->id,
+                'name' => $place->name,
+                'slug' => $place->slug,
+                'description' => $place->description,
+                'address' => $place->address,
+                'hours' => $place->hours,
+                'image' => $place->image,
+                'images' => $place->images->map(fn ($img) => [
+                    'id' => $img->id,
+                    'url' => $img->url,
+                ])->values(),
+                'category' => $place->category,
+                'tags' => $place->tags,
+                'likes_count' => $place->likes_count,
+                'is_liked' => true,
+            ]);
+
         return Inertia::render('Dashboard', [
             'ownerPlaces' => $ownerPlaces,
-            // La tabla categories usa 'label' como nombre visible
-            'categories'  => Category::orderBy('label')->get(['id', 'label']),
+            'likedPlaces' => $likedPlaces,
+            'categories' => Category::orderBy('label')->get(['id', 'label']),
         ]);
     }
 }

@@ -1,15 +1,14 @@
 import { Link } from '@inertiajs/react';
-import { useState } from 'react';
 import { getCategoryColor } from '@/utils/filterUtils';
+import { useLike } from '@/hooks/useLike';
 
 export default function PlaceCard({ place }) {
-    const [liked, setLiked] = useState(false);
+    const { liked, count, toggle } = useLike(place.id, place.is_liked ?? false, place.likes_count ?? 0);
     const bgColor = getCategoryColor(place.category);
     const mainImage = place.image ?? place.images?.[0]?.url ?? null;
 
     return (
         <article className="place-card">
-            {/* Imagen / Placeholder */}
             <div className="card-image" style={{ backgroundColor: bgColor }}>
                 {mainImage ? (
                     <img src={mainImage} alt={place.name} className="card-img" />
@@ -21,7 +20,7 @@ export default function PlaceCard({ place }) {
                 <div className="card-category-tag">{place.category?.label}</div>
                 <button 
                     className={`favorite-btn ${liked ? 'liked' : ''}`}
-                    onClick={() => setLiked(!liked)}
+                    onClick={toggle}
                     aria-label={liked ? 'Quitar de favoritos' : 'Añadir a favoritos'}
                 >
                     <svg 
@@ -33,15 +32,14 @@ export default function PlaceCard({ place }) {
                     >
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
+                    {count > 0 && <span className="like-count">{count}</span>}
                 </button>
             </div>
 
-            {/* Contenido */}
             <div className="card-body">
                 <h3 className="card-title">{place.name}</h3>
                 <p className="card-description">{place.description}</p>
 
-                {/* Tags */}
                 <div className="card-tags">
                     {place.tags?.slice(0, 3).map((tag, index) => {
                         const tagLabel = typeof tag === 'object' ? tag.name : tag;
@@ -55,7 +53,6 @@ export default function PlaceCard({ place }) {
                     })}
                 </div>
 
-                {/* Footer */}
                 <div className="card-footer">
                     <div className="card-info">
                         <span className="info-item">📍 {place.address}</span>
