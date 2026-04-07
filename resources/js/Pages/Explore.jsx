@@ -164,9 +164,10 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
     useEffect(() => {
         const params = new URLSearchParams();
         const currentSearch = searchText.trim();
+        const currentCategory = categories.find((category) => Number(category.id) === Number(activeCategory));
 
-        if (activeCategory) {
-            params.set('category', activeCategory);
+        if (currentCategory?.slug) {
+            params.set('categoria', currentCategory.slug);
         }
 
         if (activeTag) {
@@ -180,7 +181,7 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
         const query = params.toString();
         const nextUrl = query ? `/explorar?${query}` : '/explorar';
         window.history.replaceState({}, '', nextUrl);
-    }, [activeCategory, activeTag, searchText]);
+    }, [activeCategory, activeTag, categories, searchText]);
 
     function handleSelectCategory(categoryId) {
         const isSameCategory = Number(activeCategory) === Number(categoryId);

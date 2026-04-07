@@ -13,11 +13,19 @@ class ExploreController extends Controller
 {
     public function index(Request $request)
     {
-        $categoryId = $request->query('category');
+        $categorySlug = $request->query('categoria');
+        $legacyCategoryId = $request->query('category');
         $search = trim((string) $request->query('search', ''));
         $userId = Auth::id();
 
         $categories = Category::with('tags')->orderBy('label')->get();
+        $selectedCategory = null;
+
+        if ($categorySlug) {
+            $selectedCategory = $categories->firstWhere('slug', $categorySlug);
+        } elseif ($legacyCategoryId) {
+            $selectedCategory = $categories->firstWhere('id', (int) $legacyCategoryId);
+        }
 
         $placesQuery = Places::with('category', 'tags', 'images', 'primaryImage')
             ->withCount('likes');
@@ -52,7 +60,7 @@ class ExploreController extends Controller
                 'likes_count' => $place->likes_count,
                 'is_liked' => in_array($place->id, $likedPlaceIds),
             ]),
-            'selectedCategory' => $categoryId ? (int) $categoryId : null,
+            'selectedCategory' => $selectedCategory?->id,
             'search' => $search,
         ]);
     }
