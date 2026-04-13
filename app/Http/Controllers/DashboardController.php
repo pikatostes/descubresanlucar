@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -11,6 +12,17 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        $requestedTab = $request->query('tab');
+        $availableTabs = array_filter([
+            'perfil',
+            $user->role === 'owner' ? 'negocios' : null,
+            'likes',
+            $user->role === 'admin' ? 'admin' : null,
+        ]);
+
+        $activeTab = in_array($requestedTab, $availableTabs, true)
+            ? $requestedTab
+            : 'perfil';
 
         $ownerPlaces = [];
         if ($user->role === 'owner') {
@@ -49,6 +61,9 @@ class DashboardController extends Controller
             'ownerPlaces' => $ownerPlaces,
             'likedPlaces' => $likedPlaces,
             'categories' => Category::orderBy('label')->get(['id', 'label']),
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
+            'status' => session('status'),
+            'activeTab' => $activeTab,
         ]);
     }
 }

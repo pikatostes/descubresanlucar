@@ -83,7 +83,7 @@ export default function Navbar({ auth }) {
                             {userDropdownOpen && (
                                 <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white border border-gray-100 py-1 z-50">
                                     <Link
-                                        href={route('profile.edit')}
+                                        href={route('dashboard', { tab: 'perfil' })}
                                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                                         onClick={() => setUserDropdownOpen(false)}
                                     >
@@ -162,7 +162,7 @@ export default function Navbar({ auth }) {
                                 Dashboard
                             </Link>
                             <Link
-                                href={route('profile.edit')}
+                                href={route('dashboard', { tab: 'perfil' })}
                                 className="nav-link py-2 border-b border-gray-100"
                                 onClick={() => setMenuOpen(false)}
                             >

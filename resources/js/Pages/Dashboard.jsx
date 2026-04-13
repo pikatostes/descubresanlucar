@@ -2,8 +2,11 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Footer from '@/Components/Footer';
 import PlaceEditModal from '@/Components/PlaceEditModal';
 import PlaceCard from '@/Components/PlaceCard';
+import DeleteUserForm from '@/Pages/Profile/Partials/DeleteUserForm';
+import UpdatePasswordForm from '@/Pages/Profile/Partials/UpdatePasswordForm';
+import UpdateProfileInformationForm from '@/Pages/Profile/Partials/UpdateProfileInformationForm';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function IconEdit() {
     return (
@@ -104,7 +107,7 @@ function OwnerPlaceCard({ place, onEdit }) {
     );
 }
 
-export default function Dashboard({ ownerPlaces = [], likedPlaces = [], categories = [] }) {
+export default function Dashboard({ ownerPlaces = [], likedPlaces = [], categories = [], mustVerifyEmail = false, status = null, activeTab: initialActiveTab = 'perfil' }) {
     const { auth } = usePage().props;
     const isOwner = auth.user?.role === 'owner';
     const isAdmin = auth.user?.role === 'admin';
@@ -112,8 +115,26 @@ export default function Dashboard({ ownerPlaces = [], likedPlaces = [], categori
 
     const [editingPlace, setEditingPlace] = useState(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [activeTab, setActiveTab] = useState('negocios');
+    const [activeTab, setActiveTab] = useState(initialActiveTab);
     const [likedFilter, setLikedFilter] = useState('');
+
+    useEffect(() => {
+        setActiveTab(initialActiveTab);
+    }, [initialActiveTab]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+
+        if (activeTab === 'perfil') {
+            params.set('tab', 'perfil');
+        } else {
+            params.set('tab', activeTab);
+        }
+
+        const query = params.toString();
+        const nextUrl = query ? `/dashboard?${query}` : '/dashboard';
+        window.history.replaceState({}, '', nextUrl);
+    }, [activeTab]);
 
     const filteredLikedPlaces = likedPlaces.filter(place => {
         if (!likedFilter) return true;
@@ -172,6 +193,12 @@ export default function Dashboard({ ownerPlaces = [], likedPlaces = [], categori
                                 {/* Tabs */}
                                 <div className="border-b border-gray-100">
                                     <nav className="flex">
+                                        <button
+                                            onClick={() => setActiveTab('perfil')}
+                                            className={`dash-tab ${activeTab === 'perfil' ? 'dash-tab--active' : ''}`}
+                                        >
+                                            Perfil
+                                        </button>
                                         {isOwner && (
                                             <button
                                                 onClick={() => setActiveTab('negocios')}
@@ -201,6 +228,26 @@ export default function Dashboard({ ownerPlaces = [], likedPlaces = [], categori
                                         )}
                                     </nav>
                                 </div>
+
+                                {activeTab === 'perfil' && (
+                                    <div className="p-6 space-y-6">
+                                        <div className="bg-stone-50 border border-stone-200 rounded-xl p-6">
+                                            <UpdateProfileInformationForm
+                                                mustVerifyEmail={mustVerifyEmail}
+                                                status={status}
+                                                className="max-w-2xl"
+                                            />
+                                        </div>
+
+                                        <div className="bg-stone-50 border border-stone-200 rounded-xl p-6">
+                                            <UpdatePasswordForm className="max-w-2xl" />
+                                        </div>
+
+                                        <div className="bg-red-50 border border-red-100 rounded-xl p-6">
+                                            <DeleteUserForm className="max-w-2xl" />
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Tab: Negocios */}
                                 {activeTab === 'negocios' && isOwner && (
