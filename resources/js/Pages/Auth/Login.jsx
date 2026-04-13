@@ -26,7 +26,7 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <GuestLayout>
-            <Head title="Log in" />
+            <Head title="Iniciar sesión" />
 
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600">
@@ -34,8 +34,13 @@ export default function Login({ status, canResetPassword }) {
                 </div>
             )}
 
-            <form onSubmit={submit}>
-                <div>
+            <div className="auth-header">
+                <h1 className="auth-title">Bienvenido de nuevo</h1>
+                <p className="auth-subtitle">Inicia sesión para acceder a tu cuenta</p>
+            </div>
+
+            <form onSubmit={submit} className="auth-form">
+                <div className="form-group">
                     <InputLabel htmlFor="email" value="Email" />
 
                     <TextInput
@@ -52,8 +57,8 @@ export default function Login({ status, canResetPassword }) {
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                <div className="form-group">
+                    <InputLabel htmlFor="password" value="Contraseña" />
 
                     <div className="relative">
                         <TextInput
@@ -68,7 +73,7 @@ export default function Login({ status, canResetPassword }) {
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                            className="password-toggle"
                         >
                             {showPassword ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -88,7 +93,6 @@ export default function Login({ status, canResetPassword }) {
 
                 <div className="mt-4 block">
                     <div className="mt-4 flex w-full items-center justify-between">
-                        {/* Columna izquierda */}
                         <label className="flex items-center">
                             <Checkbox
                                 name="remember"
@@ -102,11 +106,10 @@ export default function Login({ status, canResetPassword }) {
                             </span>
                         </label>
 
-                        {/* Columna derecha */}
                         {canResetPassword && (
                             <Link
                                 href={route('password.request')}
-                                className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                className="forgot-link"
                             >
                                 Forgot your password?
                             </Link>
@@ -114,14 +117,16 @@ export default function Login({ status, canResetPassword }) {
                     </div>
                 </div>
 
-                <div className="mt-5 flex items-center justify-center">
-                    <PrimaryButton className="px-10 py-5" disabled={processing}>
-                        Log in
+                <div className="form-actions">
+                    <PrimaryButton className="auth-button" disabled={processing}>
+                        Iniciar sesión
                     </PrimaryButton>
                 </div>
-                <div className="mt-5 flex items-center justify-center">
-                    <Link href={route('register')} className="text-sm text-gray-600 underline hover:text-gray-900">
-                        Don't have an account?
+                
+                <div className="auth-footer-link">
+                    <span>¿No tienes cuenta? </span>
+                    <Link href={route('register')} className="register-link">
+                        Regístrate aquí
                     </Link>
                 </div>
             </form>
