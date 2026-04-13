@@ -10,18 +10,101 @@
  * @param {Object|null} place - El negocio a editar, o null para creación.
  * @returns {Object} Valores iniciales compatibles con useForm de Inertia.
  */
+const DAYS_OF_WEEK = [
+    { key: 'monday',    label: 'Lun' },
+    { key: 'tuesday',   label: 'Mar' },
+    { key: 'wednesday', label: 'Mié' },
+    { key: 'thursday',  label: 'Jue' },
+    { key: 'friday',   label: 'Vie' },
+    { key: 'saturday', label: 'Sáb' },
+    { key: 'sunday',   label: 'Dom' },
+];
+
+function parseHoursField(hoursString) {
+    if (!hoursString) {
+        return { opening_days: [], opening_time: '', closing_time: '' };
+    }
+
+    const daysPattern = '((?:lun|már|mié|jue vie|sáb|dom)[a-zé]+(?:[–-](?:lun|már|mié|jue vie|sáb|dom))?)';
+    const timePattern = '(\\d{1,2}:\\d{2})\\s*[–-]\\s*(\\d{1,2}:\\d{2})';
+    const match = hoursString.match(new RegExp(`${daysPattern}\\s*${timePattern}`, 'i'));
+
+    if (match) {
+        const timeStart = match[1];
+        const timeEnd = match[2];
+        const dayPart = match[0].replace(timeStart, '').replace(timeEnd, '').trim();
+
+        const dayMap = {
+            'lun': 'monday', 'martes': 'tuesday', 'mié': 'wednesday', 'miercoles': 'wednesday',
+            'jue': 'thursday', 'jueves': 'thursday', 'vie': 'friday', 'viernes': 'friday',
+            'sáb': 'saturday', 'sabado': 'saturday', 'dom': 'sunday', 'domingo': 'sunday'
+        };
+
+        const selectedDays = Object.keys(dayMap).some(d => dayPart.toLowerCase().includes(d))
+            ? Object.entries(dayMap).filter(([k]) => dayPart.toLowerCase().includes(k)).map(([, v]) => v)
+            : [];
+
+        return {
+            opening_days: selectedDays.length > 0 ? selectedDays : DAYS_OF_WEEK.map(d => d.key),
+            opening_time: timeStart,
+            closing_time: timeEnd
+        };
+    }
+
+    return { opening_days: [], opening_time: '', closing_time: '' };
+}
+
+function formatHoursField(openingDays, openingTime, closingTime) {
+    if (!openingDays || openingDays.length === 0 || !openingTime || !closingTime) {
+        return '';
+    }
+
+    const dayLabels = {
+        monday: 'Lun', tuesday: 'Mar', wednesday: 'Mié',
+        thursday: 'Jue', friday: 'Vie', saturday: 'Sáb', sunday: 'Dom'
+    };
+
+    const sortedDays = DAYS_OF_WEEK.map(d => d.key).filter(d => openingDays.includes(d));
+    let dayRange = '';
+
+    if (sortedDays.length === 7) {
+        dayRange = 'Lun–Dom';
+    } else if (sortedDays.length === 5 &&
+               sortedDays.includes('monday') &&
+               sortedDays.includes('tuesday') &&
+               sortedDays.includes('wednesday') &&
+               sortedDays.includes('thursday') &&
+               sortedDays.includes('friday')) {
+        dayRange = 'Lun–Vie';
+    } else if (sortedDays.length === 2 &&
+               sortedDays.includes('saturday') &&
+               sortedDays.includes('sunday')) {
+        dayRange = 'Sáb–Dom';
+    } else {
+        dayRange = sortedDays.map(d => dayLabels[d]).join(', ');
+    }
+
+    return `${dayRange} ${openingTime}–${closingTime}`;
+}
+
 export function getInitialFormValues(place) {
+    const parsedHours = parseHoursField(place?.hours);
+
     return {
-        name:        place?.name        ?? '',
-        description: place?.description ?? '',
-        address:     place?.address     ?? '',
-        phone:       place?.phone       ?? '',
-        hours:       place?.hours       ?? '',
-        category_id: place?.category_id ?? '',
-        images:      [],
+        name:          place?.name          ?? '',
+        description:   place?.description   ?? '',
+        address:       place?.address       ?? '',
+        phone:         place?.phone         ?? '',
+        opening_days: parsedHours.opening_days,
+        opening_time: parsedHours.opening_time,
+        closing_time: parsedHours.closing_time,
+        category_id:  place?.category_id  ?? '',
+        images:        [],
         deleted_image_ids: [],
     };
 }
+
+export { DAYS_OF_WEEK };
 
 /**
  * Devuelve la función de envío del formulario (submit handler).
@@ -38,12 +121,17 @@ export function buildSubmitHandler({ place, put, post, transform, onClose }) {
         e.preventDefault();
 
         const payloadWithoutEmptyImages = (formData) => {
-            if (!Array.isArray(formData.images) || formData.images.length === 0) {
-                const { images, ...payload } = formData;
-                return payload;
-            }
+            const { opening_days, opening_time, closing_time, images, ...rest } = formData;
 
-            return formData;
+            const hours = formatHoursField(opening_days, opening_time, closing_time);
+
+            const finalPayload = {
+                ...rest,
+                hours,
+                ...(Array.isArray(images) && images.length > 0 ? { images } : {}),
+            };
+
+            return finalPayload;
         };
 
         transform(payloadWithoutEmptyImages);

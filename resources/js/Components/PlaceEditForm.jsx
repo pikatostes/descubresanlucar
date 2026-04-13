@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
-import { getInitialFormValues, buildSubmitHandler, fetchAllTags } from '@/Utils/editPlaceUtils';
+import { getInitialFormValues, buildSubmitHandler, fetchAllTags, DAYS_OF_WEEK } from '@/Utils/editPlaceUtils';
 
 export default function PlaceEditForm({ place, categories, onClose }) {
     const { data, setData, post, put, transform, processing, errors } = useForm({
@@ -197,17 +197,63 @@ export default function PlaceEditForm({ place, categories, onClose }) {
 
                     {/* Horario */}
                     <div>
-                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                             Horario
                         </label>
-                        <input
-                            type="text"
-                            value={data.hours}
-                            onChange={e => setData('hours', e.target.value)}
-                            placeholder="Ej: Lun–Vie 09:00–20:00"
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
-                        />
-                        {errors.hours && <p className="text-red-500 text-xs mt-1">{errors.hours}</p>}
+
+                        <div className="space-y-3">
+                            <div>
+                                <p className="text-xs text-gray-600 mb-2">Días de apertura</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {DAYS_OF_WEEK.map(day => {
+                                        const isSelected = data.opening_days?.includes(day.key);
+                                        return (
+                                            <button
+                                                key={day.key}
+                                                type="button"
+                                                onClick={() => {
+                                                    const current = data.opening_days || [];
+                                                    if (isSelected) {
+                                                        setData('opening_days', current.filter(d => d !== day.key));
+                                                    } else {
+                                                        setData('opening_days', [...current, day.key]);
+                                                    }
+                                                }}
+                                                className={`px-3 py-1.5 text-xs rounded-full border transition ${
+                                                    isSelected
+                                                        ? 'bg-amber-500 text-white border-amber-500'
+                                                        : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200'
+                                                }`}
+                                            >
+                                                {day.label}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                {errors.hours && <p className="text-red-500 text-xs mt-1">{errors.hours}</p>}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs text-gray-600 mb-1">Apertura</label>
+                                    <input
+                                        type="time"
+                                        value={data.opening_time || ''}
+                                        onChange={e => setData('opening_time', e.target.value)}
+                                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-gray-600 mb-1">Cierre</label>
+                                    <input
+                                        type="time"
+                                        value={data.closing_time || ''}
+                                        onChange={e => setData('closing_time', e.target.value)}
+                                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
