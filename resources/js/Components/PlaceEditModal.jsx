@@ -24,7 +24,7 @@ function IconStore() {
 export default function PlaceEditModal({ place, categories, onClose }) {
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm overflow-y-auto py-6"
+            className="fixed inset-0 z-[250] flex items-center justify-center bg-black/50 backdrop-blur-sm overflow-y-auto py-6"
             onClick={(e) => e.target === e.currentTarget && onClose()}
         >
             <div className="relative w-full max-w-lg lg:max-w-4xl mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">

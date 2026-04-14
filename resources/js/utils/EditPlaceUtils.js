@@ -25,27 +25,33 @@ function parseHoursField(hoursString) {
         return { opening_days: [], opening_time: '', closing_time: '' };
     }
 
-    const daysPattern = '((?:lun|már|mié|jue vie|sáb|dom)[a-zé]+(?:[–-](?:lun|már|mié|jue vie|sáb|dom))?)';
     const timePattern = '(\\d{1,2}:\\d{2})\\s*[–-]\\s*(\\d{1,2}:\\d{2})';
-    const match = hoursString.match(new RegExp(`${daysPattern}\\s*${timePattern}`, 'i'));
+    const timeMatch = hoursString.match(new RegExp(timePattern, 'i'));
 
-    if (match) {
-        const timeStart = match[1];
-        const timeEnd = match[2];
-        const dayPart = match[0].replace(timeStart, '').replace(timeEnd, '').trim();
+    if (timeMatch) {
+        const timeStart = timeMatch[1];
+        const timeEnd = timeMatch[2];
+        const dayPart = hoursString.replace(timeMatch[0], '').trim();
 
         const dayMap = {
-            'lun': 'monday', 'martes': 'tuesday', 'mié': 'wednesday', 'miercoles': 'wednesday',
+            'lun': 'monday', 'mar': 'tuesday', 'mié': 'wednesday', 'miercoles': 'wednesday',
             'jue': 'thursday', 'jueves': 'thursday', 'vie': 'friday', 'viernes': 'friday',
-            'sáb': 'saturday', 'sabado': 'saturday', 'dom': 'sunday', 'domingo': 'sunday'
+            'sáb': 'saturday', 'sab': 'saturday', 'dom': 'sunday', 'domingo': 'sunday'
         };
 
-        const selectedDays = Object.keys(dayMap).some(d => dayPart.toLowerCase().includes(d))
-            ? Object.entries(dayMap).filter(([k]) => dayPart.toLowerCase().includes(k)).map(([, v]) => v)
-            : [];
+        const dayPartLower = dayPart.toLowerCase();
+        const selectedDays = [];
 
+        Object.entries(dayMap).forEach(([key, value]) => {
+            if (dayPartLower.includes(key)) {
+                selectedDays.push(value);
+            }
+        });
+
+        const uniqueDays = [...new Set(selectedDays)];
+        
         return {
-            opening_days: selectedDays.length > 0 ? selectedDays : DAYS_OF_WEEK.map(d => d.key),
+            opening_days: uniqueDays.length > 0 ? uniqueDays : DAYS_OF_WEEK.map(d => d.key),
             opening_time: timeStart,
             closing_time: timeEnd
         };
