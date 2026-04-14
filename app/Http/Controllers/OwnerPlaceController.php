@@ -2,34 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Places;
 use App\Models\PlaceImage;
-use Illuminate\Http\UploadedFile;
+use App\Models\Places;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class OwnerPlaceController extends Controller
 {
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:2000',
-            'address'     => 'nullable|string|max:255',
-            'phone'       => 'nullable|string|max:30',
-            'hours'       => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:30',
+            'hours' => 'nullable|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
-            'tags'        => 'nullable|array',
-            'tags.*'      => ['integer', Rule::exists('tags', 'id')->where(
+            'tags' => 'nullable|array',
+            'tags.*' => ['integer', Rule::exists('tags', 'id')->where(
                 fn ($query) => $query->where('category_id', $request->input('category_id'))
             )],
-            'images'      => 'required|array|min:1',
-            'images.*'    => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'images' => 'required|array|min:1',
+            'images.*' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         DB::transaction(function () use ($request, $validated): void {
@@ -48,18 +48,18 @@ class OwnerPlaceController extends Controller
         Gate::authorize('update', $place);
 
         $validated = $request->validate([
-            'name'        => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:2000',
-            'address'     => 'nullable|string|max:255',
-            'phone'       => 'nullable|string|max:30',
-            'hours'       => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:30',
+            'hours' => 'nullable|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
-            'tags'        => 'nullable|array',
-            'tags.*'      => ['integer', Rule::exists('tags', 'id')->where(
+            'tags' => 'nullable|array',
+            'tags.*' => ['integer', Rule::exists('tags', 'id')->where(
                 fn ($query) => $query->where('category_id', $request->input('category_id'))
             )],
-            'images'      => 'nullable|array',
-            'images.*'    => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
             'deleted_image_ids' => 'nullable|array',
             'deleted_image_ids.*' => [
                 'integer',
@@ -67,6 +67,16 @@ class OwnerPlaceController extends Controller
                     fn ($query) => $query->where('place_id', $place->id)
                 ),
             ],
+            'image_order' => 'nullable|array',
+            'image_order.*' => 'required|array',
+            'image_order.*.id' => [
+                'required',
+                'integer',
+                Rule::exists('place_images', 'id')->where(
+                    fn ($query) => $query->where('place_id', $place->id)
+                ),
+            ],
+            'image_order.*.sort_order' => 'required|integer|min:0',
         ]);
 
         $deletedImageIds = array_values(array_unique($validated['deleted_image_ids'] ?? []));
@@ -80,13 +90,17 @@ class OwnerPlaceController extends Controller
         }
 
         DB::transaction(function () use ($validated, $place, $uploadedImages): void {
-            $place->update(Arr::except($validated, ['tags', 'images', 'deleted_image_ids']));
+            $place->update(Arr::except($validated, ['tags', 'images', 'deleted_image_ids', 'image_order']));
             $place->tags()->sync($validated['tags'] ?? []);
 
             $this->deletePlaceImages($place, $validated['deleted_image_ids'] ?? []);
 
-            if (!empty($uploadedImages)) {
+            if (! empty($uploadedImages)) {
                 $this->storeUploadedImages($place, $uploadedImages);
+            }
+
+            if (! empty($validated['image_order'])) {
+                $this->updateImageOrder($place, $validated['image_order']);
             }
 
             $this->ensurePrimaryImage($place);
@@ -112,7 +126,7 @@ class OwnerPlaceController extends Controller
 
             $place->images()->create([
                 'path' => $path,
-                'is_primary' => !$hasPrimaryImage && $index === 0,
+                'is_primary' => ! $hasPrimaryImage && $index === 0,
                 'sort_order' => $nextSortOrder + $index,
             ]);
         }
@@ -149,6 +163,18 @@ class OwnerPlaceController extends Controller
         foreach ($imagesToDelete as $image) {
             Storage::disk('public')->delete($image->path);
             $image->delete();
+        }
+    }
+
+    /**
+     * @param  array<int, array{id: int, sort_order: int}>  $imageOrder
+     */
+    private function updateImageOrder(Places $place, array $imageOrder): void
+    {
+        foreach ($imageOrder as $orderItem) {
+            $place->images()
+                ->where('id', $orderItem['id'])
+                ->update(['sort_order' => $orderItem['sort_order']]);
         }
     }
 }

@@ -43,14 +43,25 @@ export default function PlaceEditForm({ place, categories, onClose }) {
     }, [place]);
 
     const visibleExistingImages = useMemo(() => {
-        if (!Array.isArray(data.deleted_image_ids) || data.deleted_image_ids.length === 0) {
-            return existingImages;
+        let images = existingImages;
+        
+        if (Array.isArray(data.image_order) && data.image_order.length > 0) {
+            const orderMap = new Map(data.image_order.map(item => [item.id, item.sort_order]));
+            images = [...existingImages].sort((a, b) => {
+                const orderA = orderMap.get(Number(a.id)) ?? 0;
+                const orderB = orderMap.get(Number(b.id)) ?? 0;
+                return orderA - orderB;
+            });
         }
 
-        return existingImages.filter((existingImage) => {
+        if (!Array.isArray(data.deleted_image_ids) || data.deleted_image_ids.length === 0) {
+            return images;
+        }
+
+        return images.filter((existingImage) => {
             return !data.deleted_image_ids.includes(Number(existingImage.id));
         });
-    }, [existingImages, data.deleted_image_ids]);
+    }, [existingImages, data.deleted_image_ids, data.image_order]);
 
     const markExistingImageForDeletion = (imageId) => {
         if (!Number.isInteger(imageId)) {
@@ -62,6 +73,44 @@ export default function PlaceEditForm({ place, categories, onClose }) {
         }
 
         setData('deleted_image_ids', [...data.deleted_image_ids, imageId]);
+    };
+
+    const moveImageUp = (index) => {
+        if (index === 0) return;
+        
+        const currentImages = [...visibleExistingImages];
+        const temp = currentImages[index];
+        currentImages[index] = currentImages[index - 1];
+        currentImages[index - 1] = temp;
+
+        const imageOrder = currentImages
+            .map((img, idx) => {
+                const numericId = Number(img.id);
+                if (!Number.isInteger(numericId)) return null;
+                return { id: numericId, sort_order: idx };
+            })
+            .filter(item => item !== null);
+
+        setData('image_order', imageOrder);
+    };
+
+    const moveImageDown = (index) => {
+        if (index === visibleExistingImages.length - 1) return;
+        
+        const currentImages = [...visibleExistingImages];
+        const temp = currentImages[index];
+        currentImages[index] = currentImages[index + 1];
+        currentImages[index + 1] = temp;
+
+        const imageOrder = currentImages
+            .map((img, idx) => {
+                const numericId = Number(img.id);
+                if (!Number.isInteger(numericId)) return null;
+                return { id: numericId, sort_order: idx };
+            })
+            .filter(item => item !== null);
+
+        setData('image_order', imageOrder);
     };
 
     // 🔹 Manejar selección de tags
@@ -272,6 +321,8 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                                     {visibleExistingImages.map((existingImage, index) => {
                                         const numericImageId = Number(existingImage.id);
                                         const canDelete = Number.isInteger(numericImageId);
+                                        const isFirst = index === 0;
+                                        const isLast = index === visibleExistingImages.length - 1;
 
                                         return (
                                             <div
@@ -288,6 +339,41 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                                                         ×
                                                     </button>
                                                 )}
+
+                                                {canDelete && (
+                                                    <div className="absolute left-1.5 top-1.5 z-10 flex flex-col gap-0.5">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => moveImageUp(index)}
+                                                            disabled={isFirst}
+                                                            className={`h-5 w-5 rounded-full flex items-center justify-center text-xs transition ${
+                                                                isFirst 
+                                                                    ? 'bg-gray-300 text-gray-400 cursor-not-allowed'
+                                                                    : 'bg-black/70 text-white hover:bg-black'
+                                                            }`}
+                                                            aria-label="Subir"
+                                                        >
+                                                            ▲
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => moveImageDown(index)}
+                                                            disabled={isLast}
+                                                            className={`h-5 w-5 rounded-full flex items-center justify-center text-xs transition ${
+                                                                isLast 
+                                                                    ? 'bg-gray-300 text-gray-400 cursor-not-allowed'
+                                                                    : 'bg-black/70 text-white hover:bg-black'
+                                                            }`}
+                                                            aria-label="Bajar"
+                                                        >
+                                                            ▼
+                                                        </button>
+                                                    </div>
+                                                )}
+
+                                                <span className="absolute top-1.5 right-8 z-10 h-5 w-5 rounded-full bg-black/50 text-white text-xs flex items-center justify-center">
+                                                    {index + 1}
+                                                </span>
 
                                                 <img
                                                     src={existingImage.url}

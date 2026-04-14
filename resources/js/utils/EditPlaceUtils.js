@@ -95,6 +95,13 @@ function formatHoursField(openingDays, openingTime, closingTime) {
 
 export function getInitialFormValues(place) {
     const parsedHours = parseHoursField(place?.hours);
+    
+    const initialImageOrder = place?.images 
+        ? place.images.map((img, idx) => ({
+            id: Number(img.id),
+            sort_order: img.sort_order ?? idx
+          }))
+        : [];
 
     return {
         name:          place?.name          ?? '',
@@ -107,6 +114,7 @@ export function getInitialFormValues(place) {
         category_id:  place?.category_id  ?? '',
         images:        [],
         deleted_image_ids: [],
+        image_order: initialImageOrder,
     };
 }
 
@@ -127,7 +135,7 @@ export function buildSubmitHandler({ place, put, post, transform, onClose }) {
         e.preventDefault();
 
         const payloadWithoutEmptyImages = (formData) => {
-            const { opening_days, opening_time, closing_time, images, ...rest } = formData;
+            const { opening_days, opening_time, closing_time, images, image_order, ...rest } = formData;
 
             const hours = formatHoursField(opening_days, opening_time, closing_time);
 
@@ -135,6 +143,7 @@ export function buildSubmitHandler({ place, put, post, transform, onClose }) {
                 ...rest,
                 hours,
                 ...(Array.isArray(images) && images.length > 0 ? { images } : {}),
+                ...(Array.isArray(image_order) && image_order.length > 0 ? { image_order } : {}),
             };
 
             return finalPayload;
