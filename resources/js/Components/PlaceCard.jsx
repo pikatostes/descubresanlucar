@@ -58,7 +58,7 @@ export default function PlaceCard({ place }) {
                         <span className="info-item">📍 {place.address}</span>
                         <span className="info-item">🕐 {place.hours}</span>
                     </div>
-                    <Link href={`/lugares/${place.id}`} className="card-btn">
+                    <Link href={`/lugares/${place.slug}`} className="card-btn">
                         Ver más →
                     </Link>
                 </div>
