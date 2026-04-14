@@ -134,7 +134,7 @@ export default function Login({ status, canResetPassword }) {
                 </div>
 
                 <div className="form-actions">
-                    <PrimaryButton className="auth-button" disabled={processing}>
+                    <PrimaryButton className="auth-button justify-center" disabled={processing}>
                         Iniciar sesión
                     </PrimaryButton>
                 </div>
