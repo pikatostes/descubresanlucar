@@ -97,8 +97,8 @@ function OwnerPlaceCard({ place, onEdit }) {
 
             {place.status && (
                 <div className={`absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full ${place.status === 'active'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-500'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-gray-100 text-gray-500'
                     }`}>
                     {place.status === 'active' ? 'Activo' : place.status}
                 </div>
@@ -169,20 +169,45 @@ export default function Dashboard({ ownerPlaces = [], likedPlaces = [], categori
                         {/* Columna izquierda — Perfil */}
                         <div className="lg:col-span-1">
                             <div className="bg-white shadow-sm rounded-xl overflow-hidden">
-                                <div className="p-6 text-center">
-                                    <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-3xl font-bold overflow-hidden">
-                                        {user.profile_photo_url || user.name.charAt(0).toUpperCase()}
+                                <div className="p-4 sm:p-6">
+
+                                    {/* Mobile horizontal / Desktop vertical */}
+                                    <div className="grid grid-cols-12 lg:grid-cols-1 gap-4 items-center text-center lg:text-center">
+
+                                        {/* Avatar */}
+                                        <div className="col-span-3 lg:col-span-1 flex justify-center">
+                                            <div className="w-14 h-14 lg:w-24 lg:h-24 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-lg lg:text-3xl font-bold overflow-hidden">
+                                                {user.profile_photo_url || user.name.charAt(0).toUpperCase()}
+                                            </div>
+                                        </div>
+
+                                        {/* Nombre + email */}
+                                        <div className="col-span-9 lg:col-span-1 text-left lg:text-center">
+                                            <h3 className="font-semibold text-gray-800 text-sm lg:text-lg leading-tight">
+                                                {user.name}
+                                            </h3>
+                                            <p className="text-xs lg:text-sm text-gray-500 truncate">
+                                                {user.email}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <h3 className="font-semibold text-gray-800 text-lg">{user.name}</h3>
-                                    <p className="text-sm text-gray-500">{user.email}</p>
-                                    <div className="mt-4 inline-block px-3 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full capitalize">
-                                        {user.role || 'usuario'}
+
+                                    {/* Role + antigüedad */}
+                                    <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 mt-4">
+                                        <div className="px-3 py-2 bg-amber-100 text-amber-700 text-xs font-semibold rounded-lg text-center capitalize">
+                                            {user.role || "usuario"}
+                                        </div>
+
+                                        <div className="px-3 py-2 lg:px-0 lg:py-0 bg-gray-50 lg:bg-transparent text-gray-500 text-xs text-center rounded-lg lg:rounded-none">
+                                            <span className="lg:text-gray-400">
+                                                Miembro desde{" "}
+                                                {new Date(user.created_at).toLocaleDateString("es-ES", {
+                                                    month: "long",
+                                                    year: "numeric",
+                                                })}
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="border-t border-gray-100 px-6 py-4">
-                                    <p className="text-xs text-gray-400 text-center">
-                                        Miembro desde {new Date(user.created_at).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
-                                    </p>
                                 </div>
                             </div>
                         </div>
