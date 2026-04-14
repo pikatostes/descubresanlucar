@@ -22,6 +22,12 @@ Route::middleware('guest')->group(function () {
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
+    Route::get('auth/google', [GoogleAuthController::class, 'redirect'])
+        ->name('google.redirect');
+
+    Route::get('auth/google/callback', [GoogleAuthController::class, 'callback'])
+        ->name('google.callback');
+
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
 
