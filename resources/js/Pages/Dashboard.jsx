@@ -89,7 +89,7 @@ function OwnerPlaceCard({ place, onEdit }) {
                             <IconEdit />
                             Editar
                         </button>
-                        <Link href={`/lugares/${place.id}`} className="card-btn">
+                        <Link href={`/lugares/${place.slug}`} className="card-btn">
                             Ver página
                         </Link>
                     </div>

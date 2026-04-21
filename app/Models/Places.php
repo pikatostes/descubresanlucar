@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Places extends Model
 {
@@ -18,6 +19,7 @@ class Places extends Model
     protected $fillable = [
         'category_id',
         'name',
+        'slug',
         'description',
         'address',
         'phone',
@@ -83,5 +85,34 @@ class Places extends Model
                 return $firstImage?->url;
             },
         );
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function ($place) {
+            if (empty($place->slug)) {
+                $place->slug = static::uniqueSlug($place->name);
+            }
+        });
+
+        static::updating(function ($place) {
+            if ($place->isDirty('name')) {
+                $place->slug = static::uniqueSlug($place->name, $place->id);
+            }
+        });
+    }
+
+    private static function uniqueSlug(string $name, ?int $excludeId = null): string
+    {
+        $slug = Str::slug($name);
+        $query = static::where('slug', $slug);
+
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        $count = $query->count();
+
+        return $count > 0 ? "{$slug}-{$count}" : $slug;
     }
 }
