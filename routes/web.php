@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BankDataController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExploreController;
@@ -48,6 +49,12 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/lugares/{place}/likes', [LikeController::class, 'toggle'])
         ->name('likes.toggle');
+
+    // Datos bancarios
+    Route::get('/bank-data', [BankDataController::class, 'index'])->name('bank-data.index');
+    Route::post('/bank-data', [BankDataController::class, 'store'])->name('bank-data.store');
+    Route::put('/bank-data/{bankData}', [BankDataController::class, 'update'])->name('bank-data.update');
+    Route::delete('/bank-data/{bankData}', [BankDataController::class, 'destroy'])->name('bank-data.destroy');
 });
 
 require __DIR__.'/auth.php';

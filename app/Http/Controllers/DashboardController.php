@@ -16,6 +16,7 @@ class DashboardController extends Controller
         $availableTabs = array_filter([
             'perfil',
             $user->role === 'owner' ? 'negocios' : null,
+            $user->role === 'owner' ? 'pago' : null,
             'likes',
             $user->role === 'admin' ? 'admin' : null,
         ]);
@@ -64,6 +65,7 @@ class DashboardController extends Controller
             'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => session('status'),
             'activeTab' => $activeTab,
+            'bankData' => $user->role === 'owner' ? $user->bankData : [],
         ]);
     }
 }

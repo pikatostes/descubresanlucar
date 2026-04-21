@@ -47,6 +47,16 @@ function IconHeart() {
     );
 }
 
+function IconCreditCard() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round"
+                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+        </svg>
+    );
+}
+
 function OwnerPlaceCard({ place, onEdit }) {
     const mainImage = place.image ?? place.images?.[0]?.url ?? null;
 
@@ -108,7 +118,7 @@ function OwnerPlaceCard({ place, onEdit }) {
     );
 }
 
-export default function Dashboard({ ownerPlaces = [], likedPlaces = [], categories = [], mustVerifyEmail = false, status = null, activeTab: initialActiveTab = 'perfil' }) {
+export default function Dashboard({ ownerPlaces = [], likedPlaces = [], categories = [], mustVerifyEmail = false, status = null, activeTab: initialActiveTab = 'perfil', bankData = [] }) {
     const { auth } = usePage().props;
     const isOwner = auth.user?.role === 'owner';
     const isAdmin = auth.user?.role === 'admin';
@@ -236,6 +246,15 @@ export default function Dashboard({ ownerPlaces = [], likedPlaces = [], categori
                                                 Mis negocios
                                             </button>
                                         )}
+                                        {isOwner && (
+                                            <button
+                                                onClick={() => setActiveTab('pago')}
+                                                className={`dash-tab ${activeTab === 'pago' ? 'dash-tab--active' : ''}`}
+                                            >
+                                                <IconCreditCard />
+                                                Pago
+                                            </button>
+                                        )}
                                         <button
                                             onClick={() => setActiveTab('likes')}
                                             className={`dash-tab ${activeTab === 'likes' ? 'dash-tab--active' : ''}`}
@@ -273,6 +292,49 @@ export default function Dashboard({ ownerPlaces = [], likedPlaces = [], categori
 
                                         <div className="rounded-xl p-6" style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA' }}>
                                             <DeleteUserForm className="max-w-2xl" />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Tab: Pago */}
+                                {activeTab === 'pago' && isOwner && (
+                                    <div className="p-6">
+                                        <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--cream)', border: '1px solid var(--brown-pale)' }}>
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div>
+                                                    <h3 className="font-semibold" style={{ color: 'var(--text-dark)' }}>Datos de pago</h3>
+                                                    <p className="text-xs" style={{ color: 'var(--text-light)' }}>
+                                                        Introduce tus datos bancarios para el cobro del anuncio.
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {bankData.length > 0 && (
+                                                <div className="mb-6 space-y-3">
+                                                    {bankData.map((item) => (
+                                                        <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg" style={{ borderColor: 'var(--brown-pale)' }}>
+                                                            <div>
+                                                                <p className="font-medium text-sm" style={{ color: 'var(--text-dark)' }}>{item.account_holder}</p>
+                                                                <p className="text-xs" style={{ color: 'var(--text-light)' }}>•••• {item.iban?.slice(-4)}</p>
+                                                                {item.is_default && (
+                                                                    <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--cream-dark)', color: 'var(--terracotta)' }}>
+                                                                        Principal
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            <Link
+                                                href="/bank-data"
+                                                className="inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-lg transition"
+                                                style={{ backgroundColor: 'var(--terracotta)' }}
+                                            >
+                                                <IconCreditCard />
+                                                {bankData.length === 0 ? 'Añadir datos de pago' : 'Gestionar métodos de pago'}
+                                            </Link>
                                         </div>
                                     </div>
                                 )}
