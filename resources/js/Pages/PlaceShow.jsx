@@ -113,50 +113,50 @@ export default function PlaceShow({ auth, place }) {
                                 </section>
                             )}
 
-                            {galleryImages.length > 0 && (
+{galleryImages.length > 0 && (
                                 <section className="place-section">
                                     <h2 className="place-section__title">Galería</h2>
 
                                     <div className="place-gallery-carousel">
-                                        <button
-                                            type="button"
-                                            className="place-gallery-carousel__arrow"
-                                            onClick={goToPreviousImage}
-                                            aria-label="Imagen anterior"
-                                        >
-                                            &#8592;
-                                        </button>
-
-                                        <div className="place-gallery-carousel__viewport">
+                                        <div className="place-gallery-carousel__main">
                                             <img
                                                 src={galleryImages[galleryIndex]}
                                                 alt={`${place.name} ${galleryIndex + 1}`}
                                                 loading="lazy"
                                                 className="place-gallery-carousel__image"
+                                                key={galleryIndex}
                                             />
+                                            <button
+                                                type="button"
+                                                className="place-gallery-carousel__arrow place-gallery-carousel__arrow--prev"
+                                                onClick={goToPreviousImage}
+                                                aria-label="Imagen anterior"
+                                            />
+                                            <button
+                                                type="button"
+                                                className="place-gallery-carousel__arrow place-gallery-carousel__arrow--next"
+                                                onClick={goToNextImage}
+                                                aria-label="Imagen siguiente"
+                                            />
+                                            <div className="place-gallery-carousel__counter">
+                                                {galleryIndex + 1} / {galleryImages.length}
+                                            </div>
                                         </div>
 
-                                        <button
-                                            type="button"
-                                            className="place-gallery-carousel__arrow"
-                                            onClick={goToNextImage}
-                                            aria-label="Imagen siguiente"
-                                        >
-                                            &#8594;
-                                        </button>
-                                    </div>
-
-                                    <div className="place-gallery-carousel__dots" role="tablist" aria-label="Miniaturas de galería">
-                                        {galleryImages.map((_, i) => (
-                                            <button
-                                                key={i}
-                                                type="button"
-                                                role="tab"
-                                                aria-selected={galleryIndex === i}
-                                                className={`place-gallery-carousel__dot ${galleryIndex === i ? 'is-active' : ''}`}
-                                                onClick={() => setGalleryIndex(i)}
-                                            />
-                                        ))}
+                                        {galleryImages.length > 1 && (
+                                            <div className="place-gallery-carousel__thumbnails">
+                                                {galleryImages.map((img, i) => (
+                                                    <button
+                                                        key={i}
+                                                        type="button"
+                                                        className={`place-gallery-carousel__thumb ${galleryIndex === i ? 'is-active' : ''}`}
+                                                        onClick={() => setGalleryIndex(i)}
+                                                    >
+                                                        <img src={img} alt="" loading="lazy" />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </section>
                             )}
