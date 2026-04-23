@@ -108,7 +108,7 @@ export default function Welcome({ auth, places = [], categories = [] }) {
                                     Encuentra justo lo que buscas en Sanlúcar
                                 </p>
                                 <div className="categories-grid">
-                                    {categories.slice(0, 6).map((cat) => (
+                                    {categories.slice(0, 12).map((cat) => (
                                         <Link
                                             key={cat.slug}
                                             href={`/explorar?categoria=${cat.slug}`}
