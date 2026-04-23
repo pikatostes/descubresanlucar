@@ -7,7 +7,7 @@
 
     <title inertia>{{ config('app.name', 'DescubreSanlúcar') }}</title>
 
-    <link rel="icon" type="image/png" href="/descubresanlucar.png" />
+    <link rel="icon" type="image/png" href="/descubre-sanlucar.png" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
