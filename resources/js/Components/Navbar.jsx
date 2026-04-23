@@ -46,14 +46,6 @@ export default function Navbar({ auth }) {
                     <Link href="/explorar" className="nav-link">Explorar</Link>
                     <Link href="/categorias" className="nav-link">Categorías</Link>
                     <Link href="/mapa" className="nav-link">Mapa</Link>
-                    {auth?.user && (
-                        <Link
-                            href={route('dashboard')}
-                            className={`nav-link${route().current('dashboard') ? ' active' : ''}`}
-                        >
-                            Dashboard
-                        </Link>
-                    )}
                 </div>
 
                 {/* Auth — oculto en móvil */}
@@ -80,14 +72,14 @@ export default function Navbar({ auth }) {
                                 </svg>
                             </button>
 
-                            {userDropdownOpen && (
+{userDropdownOpen && (
                                 <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white border border-gray-100 py-1 z-50">
                                     <Link
-                                        href={route('dashboard', { tab: 'perfil' })}
+                                        href={route('dashboard')}
                                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                                         onClick={() => setUserDropdownOpen(false)}
                                     >
-                                        Perfil
+                                        Dashboard
                                     </Link>
                                     <Link
                                         href={route('logout')}
@@ -152,24 +144,17 @@ export default function Navbar({ auth }) {
                         Mapa
                     </Link>
 
-                    {auth?.user && (
-                        <>
-                            <Link
-                                href={route('dashboard')}
-                                className="nav-link py-2 border-b border-gray-100"
-                                onClick={() => setMenuOpen(false)}
-                            >
-                                Dashboard
-                            </Link>
-                            <Link
-                                href={route('dashboard', { tab: 'perfil' })}
-                                className="nav-link py-2 border-b border-gray-100"
-                                onClick={() => setMenuOpen(false)}
-                            >
-                                Perfil
-                            </Link>
-                        </>
-                    )}
+{auth?.user && (
+                                <>
+                                    <Link
+                                        href={route('dashboard')}
+                                        className="nav-link py-2 border-b border-gray-100"
+                                        onClick={() => setMenuOpen(false)}
+                                    >
+                                        Dashboard
+                                    </Link>
+                                </>
+                            )}
 
                     <div className="flex flex-col gap-2 pt-2">
                         {auth?.user ? (
