@@ -7,13 +7,38 @@ use App\Models\User;
 
 class PlacesPolicy
 {
-    /**
-     * Solo el propietario del negocio puede actualizarlo.
-     * Se comprueba contra la columna 'role' directa de la tabla users.
-     */
+    public function viewAny(User $user): bool
+    {
+        return $user->hasRole('admin') || $user->hasRole('owner');
+    }
+
+    public function view(User $user, Places $place): bool
+    {
+        return $user->hasRole('admin') || $user->id === $place->user_id;
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->hasRole('admin') || $user->hasRole('owner');
+    }
+
     public function update(User $user, Places $place): bool
     {
-        return $user->role === 'owner'
-            && $place->user_id === $user->id;
+        return $user->hasRole('admin') || $user->id === $place->user_id;
+    }
+
+    public function delete(User $user, Places $place): bool
+    {
+        return $user->hasRole('admin');
+    }
+
+    public function restore(User $user, Places $place): bool
+    {
+        return $user->hasRole('admin');
+    }
+
+    public function forceDelete(User $user, Places $place): bool
+    {
+        return $user->hasRole('admin');
     }
 }

@@ -49,7 +49,7 @@ export default function HeroSection({ onSearch, searchValue, onSearchChange }) {
                     </button>
                 </form>
 
-                <div className="hero-stats">
+                <div className="hero-stats" style={ { display: 'none' } }>
                     <div className="stat">
                         <strong>+200</strong>
                         <span>Establecimientos</span>
