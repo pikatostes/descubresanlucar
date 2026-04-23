@@ -17,7 +17,7 @@ export default function OwnerCTA() {
                     </p>
                     <div className="cta-actions">
                         <Link href={route('register')} className="cta-btn-primary">
-                            Registrar mi negocio gratis
+                            Registrar mi negocio
                         </Link>
                         <Link href="/como-funciona" className="cta-btn-ghost">
                             Cómo funciona →

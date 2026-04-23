@@ -111,9 +111,8 @@ export default function Welcome({ auth, places = [], categories = [] }) {
                                     {categories.slice(0, 6).map((cat) => (
                                         <Link
                                             key={cat.slug}
-                                            href={`/categorias#${cat.slug}`}
+                                            href={`/explorar?categoria=${cat.slug}`}
                                             className="category-card"
-                                            onClick={() => handleCategoryChange(cat.slug)}
                                         >
                                             <span className="category-card__icon">{cat.icon}</span>
                                             <span className="category-card__label">{cat.label}</span>
