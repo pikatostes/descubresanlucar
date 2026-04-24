@@ -42,7 +42,7 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
                 return;
             }
             const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places,marker`;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
             script.async = true;
             script.defer = true;
             script.onload = resolve;
@@ -104,32 +104,29 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
         placesToShow.forEach(place => {
             if (!place.latitude || !place.longitude) return;
 
-            const content = document.createElement('div');
-            content.innerHTML = `
-                <div style="
-                    background: #D97706;
-                    color: white;
-                    padding: 6px 8px;
-                    border-radius: 20px;
-                    font-size: 12px;
-                    display: flex;
-                    align-items: center;
-                    gap: 4px;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-                    font-size: 24px;
-                    padding: 6px 8px;
-                ">
-                    <span>${categories.find(c => c.id === place.category_id)?.icon || ''}</span>
-                </div>
-            `;
-
-            const marker = new google.maps.marker.AdvancedMarkerElement({
-                position: {
-                    lat: parseFloat(place.latitude),
-                    lng: parseFloat(place.longitude),
-                },
+            const categoryIcon = place.category?.icon || '📍';
+            
+            const marker = new window.google.maps.Marker({
+                position: { lat: parseFloat(place.latitude), lng: parseFloat(place.longitude) },
                 map: googleMapRef.current,
-                content,
+                title: place.name,
+                zIndex: 1000,
+                icon: {
+                    path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z',
+                    fillColor: '#D97706',
+                    fillOpacity: 1,
+                    strokeColor: '#ffffff',
+                    strokeWeight: 3,
+                    scale: 1.8,
+                    anchor: new window.google.maps.Point(12, 22),
+                    labelOrigin: new window.google.maps.Point(12, 9),
+                },
+                label: {
+                    text: categoryIcon,
+                    color: '#000000',
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                },
             });
 
             marker.addListener('click', () => {
