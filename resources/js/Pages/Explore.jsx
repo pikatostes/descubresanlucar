@@ -326,6 +326,14 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
 
                             {/* Columna derecha - Lugares */}
                             <div className="explore-results">
+                                <ExploreSearchBar
+                                    value={searchText}
+                                    onChange={setSearchText}
+                                    onClear={handleClearSearch}
+                                    isSearching={isSearching}
+                                    statusText={searchStatus}
+                                />
+
                                 {filteredPlaces.length > 0 ? (
                                     <>
                                         <div className="results-header">
@@ -349,14 +357,6 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
                                             </div>
                                         </div>
 
-                                        <ExploreSearchBar
-                                            value={searchText}
-                                            onChange={setSearchText}
-                                            onClear={handleClearSearch}
-                                            isSearching={isSearching}
-                                            statusText={searchStatus}
-                                        />
-
                                         <div className="places-grid">
                                             {visiblePlaces.map(place => (
                                                 <PlaceCard key={place.id} place={place} />
@@ -365,14 +365,17 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
                                         {hasMorePlaces && <div ref={loadMoreRef} className="places-lazy-trigger" aria-hidden="true" />}
                                     </>
                                 ) : (
-                                    <div className="no-results">
-                                        <span className="empty-icon">🔍</span>
-                                        <h3>No se encontraron lugares</h3>
-                                        <p>Selecciona una categoría para ver los lugares</p>
-                                        <button type="button" onClick={handleClearFilter} className="btn-reset">
-                                            Ver todos los lugares
-                                        </button>
-                                    </div>
+                                    <>
+                                        <div className="results-header">
+                                            <h2 className="results-title">Resultados</h2>
+                                        </div>
+
+                                        <div className="no-results">
+                                            <span className="empty-icon">🔍</span>
+                                            <h3>No se encontraron lugares</h3>
+                                            <p>Prueba con otros filtros o busca por otro nombre</p>
+                                        </div>
+                                    </>
                                 )}
                             </div>
                         </div>
@@ -394,6 +397,9 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
                             links: [
                                 { label: 'Privacidad', href: '/privacidad' },
                                 { label: 'Términos de uso', href: '/terminos' },
+                                { label: 'Aviso Legal', href: '/aviso-legal' },
+                                { label: 'Planes y Tarifas', href: '/precios' },
+                                { label: 'Contacto', href: '/contacto' },
                             ],
                         },
                     ]}

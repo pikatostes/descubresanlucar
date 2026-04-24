@@ -19,7 +19,9 @@ Route::get('/', [WelcomeController::class, 'index']);
 // Páginas legales
 Route::get('/privacidad', fn () => Inertia::render('Privacidad'))->name('privacidad');
 Route::get('/terminos', fn () => Inertia::render('Terminos'))->name('terminos');
+Route::get('/aviso-legal', fn () => Inertia::render('AvisoLegal'))->name('aviso-legal');
 Route::get('/contacto', fn () => Inertia::render('Contacto'))->name('contacto');
+Route::get('/precios', fn () => Inertia::render('Pricing'))->name('pricing');
 
 Route::get('/lugares/{place:slug}', [PlaceController::class, 'show'])->name('places.show');
 

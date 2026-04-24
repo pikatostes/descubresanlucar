@@ -19,5 +19,6 @@ class RolesAndPermissionsSeeder extends Seeder
 
         Role::create(['name' => 'admin'])->givePermissionTo(Permission::all());
         Role::create(['name' => 'user'])->givePermissionTo('view dashboard');
+        Role::create(['name' => 'owner'])->givePermissionTo('view dashboard');
     }
 }

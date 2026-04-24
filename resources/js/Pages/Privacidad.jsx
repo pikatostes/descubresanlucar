@@ -17,6 +17,8 @@ export default function Privacidad({ auth }) {
             links: [
                 { label: 'Privacidad', href: '/privacidad' },
                 { label: 'Términos de uso', href: '/terminos' },
+                { label: 'Aviso Legal', href: '/aviso-legal' },
+                { label: 'Planes y Tarifas', href: '/precios' },
                 { label: 'Contacto', href: '/contacto' },
             ],
         },
@@ -24,7 +26,7 @@ export default function Privacidad({ auth }) {
 
     return (
         <>
-            <Head title="Política de Privacidad — DescubreSanlúcar" />
+            <Head title="Política de Privacidad" />
 
             <div className="page-root">
                 <Navbar auth={auth} />

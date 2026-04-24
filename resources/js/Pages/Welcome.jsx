@@ -108,12 +108,11 @@ export default function Welcome({ auth, places = [], categories = [] }) {
                                     Encuentra justo lo que buscas en Sanlúcar
                                 </p>
                                 <div className="categories-grid">
-                                    {categories.slice(0, 6).map((cat) => (
+                                    {categories.slice(0, 12).map((cat) => (
                                         <Link
                                             key={cat.slug}
-                                            href={`/categorias#${cat.slug}`}
+                                            href={`/explorar?categoria=${cat.slug}`}
                                             className="category-card"
-                                            onClick={() => handleCategoryChange(cat.slug)}
                                         >
                                             <span className="category-card__icon">{cat.icon}</span>
                                             <span className="category-card__label">{cat.label}</span>
@@ -370,6 +369,8 @@ export default function Welcome({ auth, places = [], categories = [] }) {
                             links: [
                                 { label: 'Privacidad', href: '/privacidad' },
                                 { label: 'Términos de uso', href: '/terminos' },
+                                { label: 'Aviso Legal', href: '/aviso-legal' },
+                                { label: 'Planes y Tarifas', href: '/precios' },
                                 { label: 'Contacto', href: '/contacto' },
                             ],
                         },

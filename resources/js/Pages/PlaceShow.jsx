@@ -36,7 +36,7 @@ export default function PlaceShow({ auth, place }) {
 
     return (
         <>
-            <Head title={`${place.name} — DescubreSanlúcar`} />
+            <Head title={`${place.name}`} />
 
             <div className="page-root">
                 <Navbar auth={auth} />
@@ -283,6 +283,8 @@ export default function PlaceShow({ auth, place }) {
                             links: [
                                 { label: 'Privacidad', href: '/privacidad' },
                                 { label: 'Términos de uso', href: '/terminos' },
+                                { label: 'Aviso Legal', href: '/aviso-legal' },
+                                { label: 'Planes y Tarifas', href: '/precios' },
                                 { label: 'Contacto', href: '/contacto' },
                             ],
                         },

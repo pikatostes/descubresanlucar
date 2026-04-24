@@ -17,6 +17,8 @@ export default function Terminos({ auth }) {
             links: [
                 { label: 'Privacidad', href: '/privacidad' },
                 { label: 'Términos de uso', href: '/terminos' },
+                { label: 'Aviso Legal', href: '/aviso-legal' },
+                { label: 'Planes y Tarifas', href: '/precios' },
                 { label: 'Contacto', href: '/contacto' },
             ],
         },
@@ -24,7 +26,7 @@ export default function Terminos({ auth }) {
 
     return (
         <>
-            <Head title="Términos de Uso — DescubreSanlúcar" />
+            <Head title="Términos de Uso" />
 
             <div className="page-root">
                 <Navbar auth={auth} />

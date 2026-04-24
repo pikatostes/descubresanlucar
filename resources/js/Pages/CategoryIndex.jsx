@@ -5,7 +5,7 @@ import Footer from '../Components/Footer';
 export default function CategoryIndex({ auth, categories = [] }) {
     return (
         <>
-            <Head title="Categorías — DescubreSanlúcar" />
+            <Head title="Categorías" />
 
             <div className="page-root">
                 <Navbar auth={auth} />
@@ -57,11 +57,14 @@ export default function CategoryIndex({ auth, categories = [] }) {
                                 { label: 'Destacados', href: '/destacados' },
                             ],
                         },
-                        {
+{
                             title: 'Legal',
                             links: [
                                 { label: 'Privacidad', href: '/privacidad' },
                                 { label: 'Términos de uso', href: '/terminos' },
+                                { label: 'Aviso Legal', href: '/aviso-legal' },
+                                { label: 'Planes y Tarifas', href: '/precios' },
+                                { label: 'Contacto', href: '/contacto' },
                             ],
                         },
                     ]}
