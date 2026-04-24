@@ -29,7 +29,7 @@ class OwnerPlaceController extends Controller
                 fn ($query) => $query->where('category_id', $request->input('category_id'))
             )],
             'images' => 'required|array|min:1',
-            'images.*' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'images.*' => 'required|image|mimes:jpg,jpeg,png,webp|mimetypes:image/jpeg,image/png,image/webp|max:2048',
         ]);
 
         DB::transaction(function () use ($request, $validated): void {
@@ -59,7 +59,7 @@ class OwnerPlaceController extends Controller
                 fn ($query) => $query->where('category_id', $request->input('category_id'))
             )],
             'images' => 'nullable|array',
-            'images.*' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'images.*' => 'required|image|mimes:jpg,jpeg,png,webp|mimetypes:image/jpeg,image/png,image/webp|max:2048',
             'deleted_image_ids' => 'nullable|array',
             'deleted_image_ids.*' => [
                 'integer',

@@ -12,8 +12,6 @@ class GeocodePlaces extends Command
 
     protected $description = 'Geocodifica las direcciones de los lugares para obtener latitud y longitud';
 
-    private string $apiKey = 'AIzaSyAP-pYLeiSe1kZulYR16WvNHlNswMtR5zc';
-
     public function handle(): int
     {
         $places = Places::whereNull('latitude')
@@ -53,9 +51,17 @@ class GeocodePlaces extends Command
 
     private function geocode(string $address): ?array
     {
+        $apiKey = config('services.google.maps_api_key');
+
+        if (empty($apiKey)) {
+            $this->error('Google Maps API Key no configurada.');
+
+            return null;
+        }
+
         $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json', [
             'address' => $address,
-            'key' => $this->apiKey,
+            'key' => $apiKey,
         ]);
 
         if ($response->successful() && $response['status'] === 'OK') {
