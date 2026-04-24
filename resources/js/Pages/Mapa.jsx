@@ -23,15 +23,15 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
 
     const filteredPlaces = useCallback(() => {
         let result = places;
-        
+
         if (selectedCategory) {
             result = result.filter(p => Number(p.category_id) === Number(selectedCategory));
         }
-        
+
         if (nearestFilter && userPos) {
             result = result.filter(p => p.within_radius);
         }
-        
+
         return result;
     }, [places, selectedCategory, nearestFilter, userPos]);
 
@@ -42,7 +42,7 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
                 return;
             }
             const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places,marker`;
             script.async = true;
             script.defer = true;
             script.onload = resolve;
@@ -54,8 +54,8 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
     const initMap = useCallback(async () => {
         try {
             await loadGoogleMaps();
-            
-            const center = userPos 
+
+            const center = userPos
                 ? { lat: userPos.lat, lng: userPos.lng }
                 : sanlucarCenter;
 
@@ -104,32 +104,44 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
         placesToShow.forEach(place => {
             if (!place.latitude || !place.longitude) return;
 
-            const marker = new window.google.maps.Marker({
-                position: { lat: parseFloat(place.latitude), lng: parseFloat(place.longitude) },
-                map: googleMapRef.current,
-                title: place.name,
-                zIndex: 1000,
-                icon: {
-                    path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z',
-                    fillColor: '#D97706',
-                    fillOpacity: 1,
-                    strokeColor: '#ffffff',
-                    strokeWeight: 3,
-                    scale: 1.8,
-                    anchor: new window.google.maps.Point(12, 22),
+            const content = document.createElement('div');
+            content.innerHTML = `
+                <div style="
+                    background: #D97706;
+                    color: white;
+                    padding: 6px 8px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                    font-size: 24px;
+                    padding: 6px 8px;
+                ">
+                    <span>${categories.find(c => c.id === place.category_id)?.icon || ''}</span>
+                </div>
+            `;
+
+            const marker = new google.maps.marker.AdvancedMarkerElement({
+                position: {
+                    lat: parseFloat(place.latitude),
+                    lng: parseFloat(place.longitude),
                 },
+                map: googleMapRef.current,
+                content,
             });
 
             marker.addListener('click', () => {
                 setSelectedPlace(place);
                 setInfoWindow({
-                    position: marker.getPosition(),
+                    position: marker.position,
                     place,
                 });
             });
 
             markersRef.current.push(marker);
-            bounds.extend(marker.getPosition());
+            bounds.extend(marker.position);
         });
 
         if (userPos) {
@@ -172,12 +184,22 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
                 };
                 setUserPos(newPos);
                 setIsLocating(false);
-                
+
                 window.history.pushState({}, '', `/mapa?lat=${newPos.lat}&lng=${newPos.lng}`);
             },
             (error) => {
                 console.error('Error getting location:', error);
-                alert('No se pudo obtener tu ubicación. Verifica los permisos.');
+                let mensaje = 'No se pudo obtener tu ubicación.';
+
+                if (error.code === 1) {
+                    mensaje = 'Permiso de ubicación denegado.\n\nPara activar la ubicación:\n• Haz clic en el icono 🔒/📍 en la barra de direcciones\n• Cambia "Permitir" a "Permitir"\n• Recarga la página';
+                } else if (error.code === 2) {
+                    mensaje = 'No se pudo determinar tu posición. Inténtalo de nuevo.';
+                } else if (error.code === 3) {
+                    mensaje = 'Tiempo de espera agotado. Inténtalo de nuevo.';
+                }
+
+                alert(mensaje);
                 setIsLocating(false);
             },
             { enableHighAccuracy: true, timeout: 10000 }
@@ -193,8 +215,8 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
 
     return (
         <>
-            <Head title="Mapa - DescubreSanlúcar" />
-            
+            <Head title="Mapa" />
+
             <div className="page-root">
                 <Navbar auth={auth} />
 
@@ -221,8 +243,8 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
                                         ✕ Quitar mi ubicación
                                     </button>
                                 ) : (
-                                    <button 
-                                        className="filter-btn primary" 
+                                    <button
+                                        className="filter-btn primary"
                                         onClick={getUserLocation}
                                         disabled={isLocating}
                                     >
@@ -253,8 +275,8 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
                             <div className="map-results">
                                 {displayedPlaces.length > 0 ? (
                                     displayedPlaces.map(place => (
-                                        <div 
-                                            key={place.id} 
+                                        <div
+                                            key={place.id}
                                             className={`map-result-item ${selectedPlace?.id === place.id ? 'selected' : ''}`}
                                             onClick={() => {
                                                 setSelectedPlace(place);
@@ -291,7 +313,7 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
                                 </div>
                             )}
                             <div ref={mapRef} className="google-map" />
-                            
+
                             {!mapLoaded && !mapError && (
                                 <div className="map-loading">
                                     <div className="spinner" />
@@ -306,8 +328,8 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
                                             ✕
                                         </button>
                                         {selectedPlace.image ? (
-                                            <img 
-                                                src={selectedPlace.image} 
+                                            <img
+                                                src={selectedPlace.image}
                                                 alt={selectedPlace.name}
                                                 className="place-card-image"
                                             />
@@ -328,13 +350,13 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
                                                 </p>
                                             )}
                                             <div className="place-card-actions">
-                                                <a 
+                                                <a
                                                     href={`/lugares/${selectedPlace.slug}`}
                                                     className="place-card-btn place-card-btn-primary"
                                                 >
                                                     Ver página
                                                 </a>
-                                                <a 
+                                                <a
                                                     href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPlace.latitude},${selectedPlace.longitude}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
