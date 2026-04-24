@@ -1,5 +1,4 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import Footer from '@/Components/Footer';
 import PlaceEditModal from '@/Components/PlaceEditModal';
 import PlaceCard from '@/Components/PlaceCard';
 import DeleteUserForm from '@/Pages/Profile/Partials/DeleteUserForm';
@@ -501,45 +500,6 @@ export default function Dashboard({ ownerPlaces = [], likedPlaces = [], categori
                     onClose={() => setShowCreateModal(false)}
                 />
             )}
-
-            <Footer
-                sections={[
-                    {
-                        title: 'Explorar',
-                        links: [
-                            { label: 'Todos los lugares', href: '/' },
-                            { label: 'Mapa interactivo', href: '/mapa' },
-                            { label: 'Destacados', href: '/destacados' },
-                        ],
-                    },
-                    {
-                        title: 'Categorías',
-                        links: [
-                            { label: 'Restaurantes', href: '/categoria/restaurantes' },
-                            { label: 'Bares', href: '/categoria/bares' },
-                            { label: 'Hoteles', href: '/categoria/hoteles' },
-                        ],
-                    },
-                    {
-                        title: 'Propietarios',
-                        links: [
-                            { label: 'Registrar negocio', href: '/register' },
-                            { label: 'Panel de control', href: '/dashboard' },
-                            { label: 'Cómo funciona', href: '/como-funciona' },
-                        ],
-                    },
-                    {
-                        title: 'Legal',
-                        links: [
-                            { label: 'Privacidad', href: '/privacidad' },
-                            { label: 'Términos de uso', href: '/terminos' },
-                            { label: 'Aviso Legal', href: '/aviso-legal' },
-                            { label: 'Planes y Tarifas', href: '/precios' },
-                            { label: 'Contacto', href: '/contacto' },
-                        ],
-                    },
-                ]}
-            />
         </AuthenticatedLayout>
     );
 }
