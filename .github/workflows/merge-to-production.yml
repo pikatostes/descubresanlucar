@@ -23,6 +23,12 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
 
+      - name: Setup environment
+        run: |
+            cp .env.example .env
+            php artisan key:generate
+            php artisan config:clear
+
       - name: Run tests
         run: php artisan test
 
