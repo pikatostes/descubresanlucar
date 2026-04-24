@@ -17,6 +17,7 @@ export default function Privacidad({ auth }) {
             links: [
                 { label: 'Privacidad', href: '/privacidad' },
                 { label: 'Términos de uso', href: '/terminos' },
+                { label: 'Aviso Legal', href: '/aviso-legal' },
                 { label: 'Contacto', href: '/contacto' },
             ],
         },

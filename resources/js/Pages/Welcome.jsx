@@ -369,6 +369,7 @@ export default function Welcome({ auth, places = [], categories = [] }) {
                             links: [
                                 { label: 'Privacidad', href: '/privacidad' },
                                 { label: 'Términos de uso', href: '/terminos' },
+                                { label: 'Aviso Legal', href: '/aviso-legal' },
                                 { label: 'Contacto', href: '/contacto' },
                             ],
                         },
