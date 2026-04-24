@@ -24,7 +24,7 @@ export default function Privacidad({ auth }) {
 
     return (
         <>
-            <Head title="Política de Privacidad — DescubreSanlúcar" />
+            <Head title="Política de Privacidad" />
 
             <div className="page-root">
                 <Navbar auth={auth} />

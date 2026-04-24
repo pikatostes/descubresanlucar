@@ -24,7 +24,7 @@ export default function Contacto({ auth }) {
 
     return (
         <>
-            <Head title="Contacto — DescubreSanlúcar" />
+            <Head title="Contacto" />
 
             <div className="page-root">
                 <Navbar auth={auth} />

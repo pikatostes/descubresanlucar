@@ -24,7 +24,7 @@ export default function Terminos({ auth }) {
 
     return (
         <>
-            <Head title="Términos de Uso — DescubreSanlúcar" />
+            <Head title="Términos de Uso" />
 
             <div className="page-root">
                 <Navbar auth={auth} />

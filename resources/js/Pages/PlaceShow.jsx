@@ -36,7 +36,7 @@ export default function PlaceShow({ auth, place }) {
 
     return (
         <>
-            <Head title={`${place.name} — DescubreSanlúcar`} />
+            <Head title={`${place.name}`} />
 
             <div className="page-root">
                 <Navbar auth={auth} />

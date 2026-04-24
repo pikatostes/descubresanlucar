@@ -171,7 +171,7 @@ export default function Dashboard({ ownerPlaces = [], likedPlaces = [], categori
                 </h2>
             }
         >
-            <Head title="DescubreSanlúcar" />
+            <Head title="Dashboard" />
 
             <div className="py-12 min-h-screen" style={{ backgroundColor: 'var(--cream)' }}>
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">

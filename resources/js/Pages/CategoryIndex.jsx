@@ -5,7 +5,7 @@ import Footer from '../Components/Footer';
 export default function CategoryIndex({ auth, categories = [] }) {
     return (
         <>
-            <Head title="Categorías — DescubreSanlúcar" />
+            <Head title="Categorías" />
 
             <div className="page-root">
                 <Navbar auth={auth} />
