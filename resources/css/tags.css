@@ -1,0 +1,106 @@
+/* ═══════════════════════════════════════════
+   CATEGORY MENU
+═══════════════════════════════════════════ */
+
+.category-menu {
+    overflow: visible !important;
+}
+
+.category-menu-inner {
+    overflow: visible !important;
+}
+
+.category-menu__item {
+    position: relative;
+    overflow: visible !important;
+}
+
+/* ═══════════════════════════════════════════
+   TAG DROPDOWN — cálido, moderno, flotante
+═══════════════════════════════════════════ */
+
+.tag-dropdown {
+    position: fixed;
+    z-index: 9999;
+    background: #fffaf7;
+    border: 1px solid rgba(196, 82, 34, 0.15);
+    border-radius: 14px;
+    padding: 10px;
+    box-shadow:
+        0 8px 24px rgba(196, 82, 34, 0.12),
+        0 2px 6px rgba(0, 0, 0, 0.06);
+    max-width: min(420px, calc(100vw - 24px));
+    animation: dropdownFadeIn 0.18s ease forwards;
+}
+
+/* ✅ La animación NO usa transform con translateX para no interferir */
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        margin-top: -4px;
+    }
+    to {
+        opacity: 1;
+        margin-top: 0px;
+    }
+}
+
+/* Flechita decorativa hacia arriba */
+.tag-dropdown::before {
+    content: none;
+}
+
+.tag-dropdown__title {
+    display: none;
+}
+
+.tag-dropdown__list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* ── Chips de etiqueta ── */
+.tag-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+
+    width: 100%;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #5a3220;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    text-align: left;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+.tag-chip:hover {
+    background: rgba(196, 82, 34, 0.08);
+    color: #c45222;
+}
+
+.tag-chip--active {
+    background: linear-gradient(135deg, #c45222, #e0763a);
+    color: #fff;
+    font-weight: 600;
+}
+
+.tag-chip--active:hover {
+    background: linear-gradient(135deg, #b04520, #c45222);
+    color: #fff;
+}
+
+.tag-chip__remove {
+    font-size: 1rem;
+    line-height: 1;
+    opacity: 0.75;
+}

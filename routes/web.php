@@ -1,27 +1,60 @@
 <?php
 
+use App\Http\Controllers\BankDataController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExploreController;
+use App\Http\Controllers\LikeController;
+use App\Http\Controllers\MapController;
+use App\Http\Controllers\OwnerPlaceController;
+use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+Route::get('/', [WelcomeController::class, 'index']);
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Páginas legales
+Route::get('/privacidad', fn () => Inertia::render('Privacidad'))->name('privacidad');
+Route::get('/terminos', fn () => Inertia::render('Terminos'))->name('terminos');
+Route::get('/contacto', fn () => Inertia::render('Contacto'))->name('contacto');
+
+Route::get('/lugares/{place:slug}', [PlaceController::class, 'show'])->name('places.show');
+
+Route::get('/categorias', [CategoryController::class, 'index'])->name('categories.index');
+
+Route::get('/explorar', [ExploreController::class, 'index'])->name('explore.index');
+
+Route::get('/mapa', [MapController::class, 'index'])->name('map.index');
+
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
+
+    // Propietario: crear negocio
+    Route::post('/owner/places', [OwnerPlaceController::class, 'store'])
+        ->name('owner.places.store');
+
+    // Propietario: actualizar sus negocios
+    Route::post('/owner/places/{place}', [OwnerPlaceController::class, 'update'])
+        ->name('owner.places.update');
+
+    Route::post('/lugares/{place}/likes', [LikeController::class, 'toggle'])
+        ->name('likes.toggle');
+
+    // Datos bancarios
+    Route::get('/bank-data', [BankDataController::class, 'index'])->name('bank-data.index');
+    Route::post('/bank-data', [BankDataController::class, 'store'])->name('bank-data.store');
+    Route::put('/bank-data/{bankData}', [BankDataController::class, 'update'])->name('bank-data.update');
+    Route::delete('/bank-data/{bankData}', [BankDataController::class, 'destroy'])->name('bank-data.destroy');
 });
 
 require __DIR__.'/auth.php';

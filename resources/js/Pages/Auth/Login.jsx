@@ -26,7 +26,7 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <GuestLayout>
-            <Head title="Log in" />
+            <Head title="Iniciar sesión" />
 
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600">
@@ -34,8 +34,29 @@ export default function Login({ status, canResetPassword }) {
                 </div>
             )}
 
-            <form onSubmit={submit}>
-                <div>
+            <div className="auth-header">
+                <h1 className="auth-title">Bienvenido de nuevo</h1>
+                <p className="auth-subtitle">Inicia sesión para acceder a tu cuenta</p>
+            </div>
+
+            <div className="social-login">
+                <a href={route('google.redirect')} className="social-button google-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20">
+                        <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                        <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                        <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.966,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                        <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.084,4.166-3.946,5.136l6.474,5.317C42.146,36.096,43.611,28.311,43.611,20.083z"/>
+                    </svg>
+                    <span>Iniciar sesión con Google</span>
+                </a>
+            </div>
+
+            <div className="divider">
+                <span>o</span>
+            </div>
+
+            <form onSubmit={submit} className="auth-form">
+                <div className="form-group">
                     <InputLabel htmlFor="email" value="Email" />
 
                     <TextInput
@@ -52,8 +73,8 @@ export default function Login({ status, canResetPassword }) {
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                <div className="form-group">
+                    <InputLabel htmlFor="password" value="Contraseña" />
 
                     <div className="relative">
                         <TextInput
@@ -68,7 +89,7 @@ export default function Login({ status, canResetPassword }) {
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                            className="password-toggle"
                         >
                             {showPassword ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -88,7 +109,6 @@ export default function Login({ status, canResetPassword }) {
 
                 <div className="mt-4 block">
                     <div className="mt-4 flex w-full items-center justify-between">
-                        {/* Columna izquierda */}
                         <label className="flex items-center">
                             <Checkbox
                                 name="remember"
@@ -102,11 +122,10 @@ export default function Login({ status, canResetPassword }) {
                             </span>
                         </label>
 
-                        {/* Columna derecha */}
                         {canResetPassword && (
                             <Link
                                 href={route('password.request')}
-                                className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                className="forgot-link"
                             >
                                 Forgot your password?
                             </Link>
@@ -114,14 +133,16 @@ export default function Login({ status, canResetPassword }) {
                     </div>
                 </div>
 
-                <div className="mt-5 flex items-center justify-center">
-                    <PrimaryButton className="px-10 py-5" disabled={processing}>
-                        Log in
+                <div className="form-actions">
+                    <PrimaryButton className="auth-button justify-center" disabled={processing}>
+                        Iniciar sesión
                     </PrimaryButton>
                 </div>
-                <div className="mt-5 flex items-center justify-center">
-                    <Link href={route('register')} className="text-sm text-gray-600 underline hover:text-gray-900">
-                        Don't have an account?
+                
+                <div className="auth-footer-link">
+                    <span>¿No tienes cuenta? </span>
+                    <Link href={route('register')} className="register-link">
+                        Regístrate aquí
                     </Link>
                 </div>
             </form>

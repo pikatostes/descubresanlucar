@@ -1,11 +1,20 @@
 import '../css/app.css';
+import '../css/Navbar.css';
+import '../css/Footer.css';
+import '../css/Welcome.css';
+import '../css/Explore.css';
+import '../css/CategoryIndex.css';
+import '../css/PlaceShow.css';
+import '../css/HeroSection.css';
+import '../css/tags.css';
+import '../css/Legal.css';
 import './bootstrap';
 
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'DescubreSanlúcar';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
