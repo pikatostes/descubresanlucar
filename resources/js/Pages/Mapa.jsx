@@ -149,11 +149,11 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
                 zIndex: 999,
                 icon: {
                     path: window.google.maps.SymbolPath.CIRCLE,
-                    scale: 12,
+                    scale: 20,
                     fillColor: '#3B82F6',
                     fillOpacity: 1,
                     strokeColor: '#ffffff',
-                    strokeWeight: 3,
+                    strokeWeight: 4,
                 },
             });
             markersRef.current.push(userMarker);
