@@ -46,7 +46,8 @@ class PlacesResource extends Resource
                     ->maxLength(20)
                     ->default(null),
                 Forms\Components\TextInput::make('hours')
-                    ->maxLength(255)
+                    ->label('Horario (JSON)')
+                    ->hint('Formato: {"monday": [{"open": "09:00", "close": "20:00"}]}')
                     ->default(null),
                 Forms\Components\Repeater::make('images')
                     ->relationship('images')

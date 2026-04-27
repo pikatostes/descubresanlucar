@@ -3,6 +3,7 @@ import { useState } from 'react';
 import MainLayout from '../Layouts/MainLayout';
 import { getCategoryColor } from '@/utils/filterUtils';
 import { useLike } from '@/hooks/useLike';
+import HoursDisplay, { getHoursShortSummary } from '@/utils/hoursUtils.jsx';
 
 export default function PlaceShow({ auth, place }) {
     const bgColor = getCategoryColor(place.category);
@@ -65,7 +66,7 @@ export default function PlaceShow({ auth, place }) {
 
                             <div className="place-hero__meta">
                                 {place.address && <span>📍 {place.address}</span>}
-                                {place.hours && <span>🕐 {place.hours}</span>}
+                                {place.hours && <span>🕐 {getHoursShortSummary(place.hours)}</span>}
                             </div>
 
                             {place.rating != null && (
@@ -202,10 +203,7 @@ export default function PlaceShow({ auth, place }) {
                                     </div>
                                 )}
                                 {place.hours && (
-                                    <div className="place-infocard__row">
-                                        <span className="info-icon">🕐</span>
-                                        <span>{place.hours}</span>
-                                    </div>
+                                    <HoursDisplay hours={place.hours} showFull={true} />
                                 )}
                                 {place.phone && (
                                     <div className="place-infocard__row">

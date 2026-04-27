@@ -22,7 +22,7 @@ class OwnerPlaceController extends Controller
             'description' => 'nullable|string|max:2000',
             'address' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:30',
-            'hours' => 'nullable|string|max:255',
+            'hours' => 'nullable|array',
             'category_id' => 'nullable|exists:categories,id',
             'tags' => 'nullable|array',
             'tags.*' => ['integer', Rule::exists('tags', 'id')->where(
@@ -52,7 +52,7 @@ class OwnerPlaceController extends Controller
             'description' => 'nullable|string|max:2000',
             'address' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:30',
-            'hours' => 'nullable|string|max:255',
+            'hours' => 'nullable|array',
             'category_id' => 'nullable|exists:categories,id',
             'tags' => 'nullable|array',
             'tags.*' => ['integer', Rule::exists('tags', 'id')->where(

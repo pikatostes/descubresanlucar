@@ -1,30 +1,219 @@
 import { useForm } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
-import { getInitialFormValues, buildSubmitHandler, fetchAllTags, DAYS_OF_WEEK } from '@/Utils/editPlaceUtils';
+import { getInitialFormValues, buildSubmitHandler, fetchAllTags, DAYS_OF_WEEK, getDefaultSchedule } from '@/Utils/editPlaceUtils';
+
+function ScheduleEditor({ schedule, onChange }) {
+    const updateDay = (dayKey, updates) => {
+        const newSchedule = schedule.map(day =>
+            day.day === dayKey ? { ...day, ...updates } : day
+        );
+        onChange(newSchedule);
+    };
+
+    const addTimeRange = (dayKey) => {
+        const newSchedule = schedule.map(day => {
+            if (day.day === dayKey) {
+                return {
+                    ...day,
+                    ranges: [...day.ranges, { open: '09:00', close: '20:00' }]
+                };
+            }
+            return day;
+        });
+        onChange(newSchedule);
+    };
+
+    const removeTimeRange = (dayKey, rangeIndex) => {
+        const newSchedule = schedule.map(day => {
+            if (day.day === dayKey) {
+                const newRanges = day.ranges.filter((_, idx) => idx !== rangeIndex);
+                return { ...day, ranges: newRanges };
+            }
+            return day;
+        });
+        onChange(newSchedule);
+    };
+
+    const updateTimeRange = (dayKey, rangeIndex, field, value) => {
+        const newSchedule = schedule.map(day => {
+            if (day.day === dayKey) {
+                const newRanges = day.ranges.map((range, idx) => {
+                    if (idx === rangeIndex) {
+                        return { ...range, [field]: value };
+                    }
+                    return range;
+                });
+                return { ...day, ranges: newRanges };
+            }
+            return day;
+        });
+        onChange(newSchedule);
+    };
+
+    const copyScheduleToAll = (fromDay) => {
+        const sourceDay = schedule.find(d => d.day === fromDay);
+        if (!sourceDay) return;
+
+        const newSchedule = schedule.map(day => ({
+            day: day.day,
+            closed: sourceDay.closed,
+            ranges: sourceDay.closed ? [] : sourceDay.ranges.map(r => ({ ...r }))
+        }));
+        onChange(newSchedule);
+    };
+
+    const copyWeekdaysToWeekends = () => {
+        const weekdays = schedule.filter(d => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].includes(d.day));
+        const weekdaysAreEqual = weekdays.every(d =>
+            d.closed === weekdays[0].closed &&
+            d.ranges.length === weekdays[0].ranges.length &&
+            d.ranges.every((r, i) => r.open === weekdays[0].ranges[i]?.open && r.close === weekdays[0].ranges[i]?.close)
+        );
+
+        if (weekdaysAreEqual && !weekdays[0].closed) {
+            const newSchedule = schedule.map(day => {
+                if (['saturday', 'sunday'].includes(day.day)) {
+                    return {
+                        day: day.day,
+                        closed: weekdays[0].closed,
+                        ranges: weekdays[0].ranges.map(r => ({ ...r }))
+                    };
+                }
+                return day;
+            });
+            onChange(newSchedule);
+        }
+    };
+
+    return (
+        <div className="space-y-3">
+            <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Horario</p>
+                <div className="flex gap-2">
+                    <select
+                        onChange={(e) => {
+                            if (e.target.value) {
+                                copyScheduleToAll(e.target.value);
+                                e.target.value = '';
+                            }
+                        }}
+                        className="text-xs border border-gray-200 rounded px-2 py-1 bg-white"
+                    >
+                        <option value="">Copiar a todos...</option>
+                        {DAYS_OF_WEEK.map(day => (
+                            <option key={day.key} value={day.key}>{day.labelFull}</option>
+                        ))}
+                    </select>
+                    <button
+                        type="button"
+                        onClick={copyWeekdaysToWeekends}
+                        className="text-xs border border-gray-200 rounded px-2 py-1 bg-white hover:bg-gray-50"
+                    >
+                        Copiar Lun–Vie a Sáb–Dom
+                    </button>
+                </div>
+            </div>
+
+            <div className="space-y-2 max-h-80 overflow-y-auto">
+                {DAYS_OF_WEEK.map(day => {
+                    const daySchedule = schedule.find(s => s.day === day.key) || {
+                        day: day.key,
+                        closed: true,
+                        ranges: []
+                    };
+
+                    return (
+                        <div key={day.key} className="flex items-start gap-2 p-2 border border-gray-100 rounded-lg">
+                            <div className="w-16 flex-shrink-0">
+                                <span className="text-xs font-medium text-gray-700">{day.labelFull}</span>
+                            </div>
+
+                            <div className="flex items-center">
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={!daySchedule.closed}
+                                        onChange={(e) => updateDay(day.key, {
+                                            closed: !e.target.checked,
+                                            ranges: !e.target.checked && daySchedule.ranges.length === 0
+                                                ? [{ open: '09:00', close: '20:00' }]
+                                                : daySchedule.ranges
+                                        })}
+                                        className="sr-only peer"
+                                    />
+                                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                                </label>
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                                {daySchedule.closed ? (
+                                    <span className="text-xs text-gray-400 italic">Cerrado</span>
+                                ) : (
+                                    <div className="space-y-1">
+                                        {daySchedule.ranges.map((range, rangeIndex) => (
+                                            <div key={rangeIndex} className="flex items-center gap-1">
+                                                <input
+                                                    type="time"
+                                                    value={range.open}
+                                                    onChange={(e) => updateTimeRange(day.key, rangeIndex, 'open', e.target.value)}
+                                                    className="w-20 text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                                                />
+                                                <span className="text-xs text-gray-400">–</span>
+                                                <input
+                                                    type="time"
+                                                    value={range.close}
+                                                    onChange={(e) => updateTimeRange(day.key, rangeIndex, 'close', e.target.value)}
+                                                    className="w-20 text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                                                />
+                                                {daySchedule.ranges.length > 1 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeTimeRange(day.key, rangeIndex)}
+                                                        className="text-red-400 hover:text-red-600 text-xs"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                        <button
+                                            type="button"
+                                            onClick={() => addTimeRange(day.key)}
+                                            className="text-xs text-amber-600 hover:text-amber-700"
+                                        >
+                                            + Añadir franja
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
 
 export default function PlaceEditForm({ place, categories, onClose }) {
     const { data, setData, post, put, transform, processing, errors } = useForm({
         ...getInitialFormValues(place),
-        tags: place?.tags?.map(t => Number(t.id)) ?? [], // importante para edición
+        tags: place?.tags?.map(t => Number(t.id)) ?? [],
     });
 
     const handleSubmit = buildSubmitHandler({ place, put, post, transform, onClose });
 
     const [tags, setTags] = useState([]);
 
-    // 🔹 Cargar todos los tags
     useEffect(() => {
         fetchAllTags().then(setTags);
     }, []);
 
-    // 🔹 Filtrar por categoría seleccionada
     const filteredTags = tags.filter(tag => tag.category_id == data.category_id);
 
     const selectedImagePreviews = useMemo(() => {
         if (!Array.isArray(data.images) || data.images.length === 0) {
             return [];
         }
-
         return data.images.map((imageFile) => URL.createObjectURL(imageFile));
     }, [data.images]);
 
@@ -38,13 +227,12 @@ export default function PlaceEditForm({ place, categories, onClose }) {
         if (!Array.isArray(place?.images)) {
             return place?.image ? [{ id: 'legacy-image', url: place.image }] : [];
         }
-
         return place.images;
     }, [place]);
 
     const visibleExistingImages = useMemo(() => {
         let images = existingImages;
-        
+
         if (Array.isArray(data.image_order) && data.image_order.length > 0) {
             const orderMap = new Map(data.image_order.map(item => [item.id, item.sort_order]));
             images = [...existingImages].sort((a, b) => {
@@ -64,20 +252,16 @@ export default function PlaceEditForm({ place, categories, onClose }) {
     }, [existingImages, data.deleted_image_ids, data.image_order]);
 
     const markExistingImageForDeletion = (imageId) => {
-        if (!Number.isInteger(imageId)) {
-            return;
-        }
+        if (!Number.isInteger(imageId)) return;
 
-        if (data.deleted_image_ids.includes(imageId)) {
-            return;
-        }
+        if (data.deleted_image_ids.includes(imageId)) return;
 
         setData('deleted_image_ids', [...data.deleted_image_ids, imageId]);
     };
 
     const moveImageUp = (index) => {
         if (index === 0) return;
-        
+
         const currentImages = [...visibleExistingImages];
         const temp = currentImages[index];
         currentImages[index] = currentImages[index - 1];
@@ -96,7 +280,7 @@ export default function PlaceEditForm({ place, categories, onClose }) {
 
     const moveImageDown = (index) => {
         if (index === visibleExistingImages.length - 1) return;
-        
+
         const currentImages = [...visibleExistingImages];
         const temp = currentImages[index];
         currentImages[index] = currentImages[index + 1];
@@ -113,7 +297,6 @@ export default function PlaceEditForm({ place, categories, onClose }) {
         setData('image_order', imageOrder);
     };
 
-    // 🔹 Manejar selección de tags
     const toggleTag = (tagId) => {
         const normalizedTagId = Number(tagId);
 
@@ -122,6 +305,10 @@ export default function PlaceEditForm({ place, categories, onClose }) {
         } else {
             setData('tags', [...data.tags, normalizedTagId]);
         }
+    };
+
+    const updateSchedule = (newSchedule) => {
+        setData('schedule', newSchedule);
     };
 
     return (
@@ -245,65 +432,10 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                     </div>
 
                     {/* Horario */}
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                            Horario
-                        </label>
-
-                        <div className="space-y-3">
-                            <div>
-                                <p className="text-xs text-gray-600 mb-2">Días de apertura</p>
-                                <div className="flex flex-wrap gap-2">
-                                    {DAYS_OF_WEEK.map(day => {
-                                        const isSelected = data.opening_days?.includes(day.key);
-                                        return (
-                                            <button
-                                                key={day.key}
-                                                type="button"
-                                                onClick={() => {
-                                                    const current = data.opening_days || [];
-                                                    if (isSelected) {
-                                                        setData('opening_days', current.filter(d => d !== day.key));
-                                                    } else {
-                                                        setData('opening_days', [...current, day.key]);
-                                                    }
-                                                }}
-                                                className={`px-3 py-1.5 text-xs rounded-full border transition ${
-                                                    isSelected
-                                                        ? 'bg-amber-500 text-white border-amber-500'
-                                                        : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200'
-                                                }`}
-                                            >
-                                                {day.label}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                                {errors.hours && <p className="text-red-500 text-xs mt-1">{errors.hours}</p>}
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-xs text-gray-600 mb-1">Apertura</label>
-                                    <input
-                                        type="time"
-                                        value={data.opening_time || ''}
-                                        onChange={e => setData('opening_time', e.target.value)}
-                                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-gray-600 mb-1">Cierre</label>
-                                    <input
-                                        type="time"
-                                        value={data.closing_time || ''}
-                                        onChange={e => setData('closing_time', e.target.value)}
-                                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <ScheduleEditor
+                        schedule={data.schedule}
+                        onChange={updateSchedule}
+                    />
                 </div>
 
                 <div className="space-y-3 lg:order-1 lg:sticky lg:top-0 lg:self-start">
@@ -347,7 +479,7 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                                                             onClick={() => moveImageUp(index)}
                                                             disabled={isFirst}
                                                             className={`h-5 w-5 rounded-full flex items-center justify-center text-xs transition ${
-                                                                isFirst 
+                                                                isFirst
                                                                     ? 'bg-gray-300 text-gray-400 cursor-not-allowed'
                                                                     : 'bg-black/70 text-white hover:bg-black'
                                                             }`}
@@ -360,7 +492,7 @@ export default function PlaceEditForm({ place, categories, onClose }) {
                                                             onClick={() => moveImageDown(index)}
                                                             disabled={isLast}
                                                             className={`h-5 w-5 rounded-full flex items-center justify-center text-xs transition ${
-                                                                isLast 
+                                                                isLast
                                                                     ? 'bg-gray-300 text-gray-400 cursor-not-allowed'
                                                                     : 'bg-black/70 text-white hover:bg-black'
                                                             }`}

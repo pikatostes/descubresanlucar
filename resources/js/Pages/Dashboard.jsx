@@ -6,6 +6,7 @@ import UpdatePasswordForm from '@/Pages/Profile/Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from '@/Pages/Profile/Partials/UpdateProfileInformationForm';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import { getHoursShortSummary } from '@/utils/hoursUtils.jsx';
 
 function IconEdit() {
     return (
@@ -101,7 +102,7 @@ function OwnerPlaceCard({ place, onEdit }) {
                     <p className="text-xs truncate" style={{ color: 'var(--text-light)' }}>📞 {place.phone}</p>
                 )}
                 {place.hours && (
-                    <p className="text-xs truncate" style={{ color: 'var(--text-light)' }}>🕐 {place.hours}</p>
+                    <p className="text-xs truncate" style={{ color: 'var(--text-light)' }}>🕐 {getHoursShortSummary(place.hours)}</p>
                 )}
             </div>
 
