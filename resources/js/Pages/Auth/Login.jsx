@@ -118,7 +118,7 @@ export default function Login({ status, canResetPassword }) {
                                 }
                             />
                             <span className="text-sm text-gray-600 ms-2">
-                                Remember me
+                                Acuérdate de mí
                             </span>
                         </label>
 
@@ -127,7 +127,7 @@ export default function Login({ status, canResetPassword }) {
                                 href={route('password.request')}
                                 className="forgot-link"
                             >
-                                Forgot your password?
+                                ¿Olvidaste tu contraseña?
                             </Link>
                         )}
                     </div>
