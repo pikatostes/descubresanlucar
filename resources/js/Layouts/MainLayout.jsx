@@ -1,10 +1,13 @@
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
+import { usePage } from '@inertiajs/react';
 
 export default function MainLayout({ children }) {
+    const { auth } = usePage().props;
+
     return (
         <>
-            <Navbar />
+            <Navbar auth={auth} />
             <main>{children}</main>
             <Footer
                 sections={[
