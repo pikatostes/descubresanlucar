@@ -1,36 +1,12 @@
 import { Head, Link } from '@inertiajs/react';
-import Navbar from '../Components/Navbar';
-import Footer from '../Components/Footer';
+import MainLayout from '../Layouts/MainLayout';
 
 export default function Terminos({ auth }) {
-    const footerSections = [
-        {
-            title: 'Explorar',
-            links: [
-                { label: 'Todos los lugares', href: '/' },
-                { label: 'Categorías', href: '/categorias' },
-                { label: 'Explorar', href: '/explorar' },
-            ],
-        },
-        {
-            title: 'Legal',
-            links: [
-                { label: 'Privacidad', href: '/privacidad' },
-                { label: 'Términos de uso', href: '/terminos' },
-                { label: 'Aviso Legal', href: '/aviso-legal' },
-                { label: 'Planes y Tarifas', href: '/precios' },
-                { label: 'Contacto', href: '/contacto' },
-            ],
-        },
-    ];
-
     return (
-        <>
+        <MainLayout>
             <Head title="Términos de Uso" />
 
             <div className="page-root">
-                <Navbar auth={auth} />
-
                 <main className="legal-page">
                     <div className="legal-inner">
                         <Link href="/" className="legal-back">← Volver al inicio</Link>
@@ -137,9 +113,7 @@ export default function Terminos({ auth }) {
                         </div>
                     </div>
                 </main>
-
-                <Footer sections={footerSections} />
             </div>
-        </>
+        </MainLayout>
     );
 }

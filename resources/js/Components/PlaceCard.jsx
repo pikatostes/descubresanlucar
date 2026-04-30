@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { getCategoryColor } from '@/utils/filterUtils';
 import { useLike } from '@/hooks/useLike';
+import { getHoursShortSummary } from '@/utils/hoursUtils.jsx';
 
 export default function PlaceCard({ place }) {
     const { liked, count, toggle } = useLike(place.id, place.is_liked ?? false, place.likes_count ?? 0);
@@ -56,7 +57,7 @@ export default function PlaceCard({ place }) {
                 <div className="card-footer">
                     <div className="card-info">
                         <span className="info-item">📍 {place.address}</span>
-                        <span className="info-item">🕐 {place.hours}</span>
+                        <span className="info-item">🕐 {getHoursShortSummary(place.hours)}</span>
                     </div>
                     <Link href={`/lugares/${place.slug}`} className="card-btn">
                         Ver más →

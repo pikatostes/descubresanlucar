@@ -3,104 +3,181 @@
  * Lógica reutilizable para el formulario de creación/edición de negocios.
  */
 
-/**
- * Devuelve los valores iniciales del formulario a partir de un place existente
- * o valores vacíos si se está creando uno nuevo.
- *
- * @param {Object|null} place - El negocio a editar, o null para creación.
- * @returns {Object} Valores iniciales compatibles con useForm de Inertia.
- */
 const DAYS_OF_WEEK = [
-    { key: 'monday',    label: 'Lun' },
-    { key: 'tuesday',   label: 'Mar' },
-    { key: 'wednesday', label: 'Mié' },
-    { key: 'thursday',  label: 'Jue' },
-    { key: 'friday',   label: 'Vie' },
-    { key: 'saturday', label: 'Sáb' },
-    { key: 'sunday',   label: 'Dom' },
+    { key: 'monday',    label: 'Lun', labelFull: 'Lunes' },
+    { key: 'tuesday',   label: 'Mar', labelFull: 'Martes' },
+    { key: 'wednesday', label: 'Mié', labelFull: 'Miércoles' },
+    { key: 'thursday',  label: 'Jue', labelFull: 'Jueves' },
+    { key: 'friday',   label: 'Vie', labelFull: 'Viernes' },
+    { key: 'saturday', label: 'Sáb', labelFull: 'Sábado' },
+    { key: 'sunday',   label: 'Dom', labelFull: 'Domingo' },
 ];
 
-function parseHoursField(hoursString) {
-    if (!hoursString) {
-        return { opening_days: [], opening_time: '', closing_time: '' };
+const DAY_LABELS_SHORT = {
+    monday: 'Lun', tuesday: 'Mar', wednesday: 'Mié',
+    thursday: 'Jue', friday: 'Vie', saturday: 'Sáb', sunday: 'Dom'
+};
+
+const DAY_LABELS_FULL = {
+    monday: 'Lunes', tuesday: 'Martes', wednesday: 'Miércoles',
+    thursday: 'Jueves', friday: 'Viernes', saturday: 'Sábado', sunday: 'Domingo'
+};
+
+function getDefaultSchedule() {
+    return DAYS_OF_WEEK.map(day => ({
+        day: day.key,
+        closed: false,
+        ranges: [{ open: '09:00', close: '20:00' }]
+    }));
+}
+
+function parseHoursFromJson(hoursJson) {
+    if (!hoursJson || typeof hoursJson !== 'object') {
+        return getDefaultSchedule();
     }
 
+    return DAYS_OF_WEEK.map(day => {
+        if (hoursJson[day.key]) {
+            return {
+                day: day.key,
+                closed: false,
+                ranges: hoursJson[day.key]
+            };
+        }
+        return {
+            day: day.key,
+            closed: true,
+            ranges: []
+        };
+    });
+}
+
+function parseHoursFromString(hoursString) {
+    if (!hoursString) {
+        return getDefaultSchedule();
+    }
+
+    const schedule = getDefaultSchedule();
     const timePattern = '(\\d{1,2}:\\d{2})\\s*[–-]\\s*(\\d{1,2}:\\d{2})';
     const timeMatch = hoursString.match(new RegExp(timePattern, 'i'));
 
-    if (timeMatch) {
-        const timeStart = timeMatch[1];
-        const timeEnd = timeMatch[2];
-        const dayPart = hoursString.replace(timeMatch[0], '').trim();
-
-        const dayMap = {
-            'lun': 'monday', 'mar': 'tuesday', 'mié': 'wednesday', 'miercoles': 'wednesday',
-            'jue': 'thursday', 'jueves': 'thursday', 'vie': 'friday', 'viernes': 'friday',
-            'sáb': 'saturday', 'sab': 'saturday', 'dom': 'sunday', 'domingo': 'sunday'
-        };
-
-        const dayPartLower = dayPart.toLowerCase();
-        const selectedDays = [];
-
-        Object.entries(dayMap).forEach(([key, value]) => {
-            if (dayPartLower.includes(key)) {
-                selectedDays.push(value);
-            }
-        });
-
-        const uniqueDays = [...new Set(selectedDays)];
-        
-        return {
-            opening_days: uniqueDays.length > 0 ? uniqueDays : DAYS_OF_WEEK.map(d => d.key),
-            opening_time: timeStart,
-            closing_time: timeEnd
-        };
+    if (!timeMatch) {
+        return schedule;
     }
 
-    return { opening_days: [], opening_time: '', closing_time: '' };
-}
+    const openTime = timeMatch[1];
+    const closeTime = timeMatch[2];
+    const dayPart = hoursString.replace(timeMatch[0], '').trim();
 
-function formatHoursField(openingDays, openingTime, closingTime) {
-    if (!openingDays || openingDays.length === 0 || !openingTime || !closingTime) {
-        return '';
-    }
-
-    const dayLabels = {
-        monday: 'Lun', tuesday: 'Mar', wednesday: 'Mié',
-        thursday: 'Jue', friday: 'Vie', saturday: 'Sáb', sunday: 'Dom'
+    const dayMap = {
+        'lun': 'monday', 'mar': 'tuesday', 'mié': 'wednesday', 'miercoles': 'wednesday',
+        'jue': 'thursday', 'jueves': 'thursday', 'vie': 'friday', 'viernes': 'friday',
+        'sáb': 'saturday', 'sab': 'saturday', 'dom': 'sunday', 'domingo': 'sunday'
     };
 
-    const sortedDays = DAYS_OF_WEEK.map(d => d.key).filter(d => openingDays.includes(d));
-    let dayRange = '';
+    const dayPartLower = dayPart.toLowerCase();
+    const selectedDays = [];
 
-    if (sortedDays.length === 7) {
-        dayRange = 'Lun–Dom';
-    } else if (sortedDays.length === 5 &&
-               sortedDays.includes('monday') &&
-               sortedDays.includes('tuesday') &&
-               sortedDays.includes('wednesday') &&
-               sortedDays.includes('thursday') &&
-               sortedDays.includes('friday')) {
-        dayRange = 'Lun–Vie';
-    } else if (sortedDays.length === 2 &&
-               sortedDays.includes('saturday') &&
-               sortedDays.includes('sunday')) {
-        dayRange = 'Sáb–Dom';
-    } else {
-        dayRange = sortedDays.map(d => dayLabels[d]).join(', ');
+    Object.entries(dayMap).forEach(([key, value]) => {
+        if (dayPartLower.includes(key)) {
+            selectedDays.push(value);
+        }
+    });
+
+    const uniqueDays = [...new Set(selectedDays)];
+    const targetDays = uniqueDays.length > 0 ? uniqueDays : DAYS_OF_WEEK.map(d => d.key);
+
+    targetDays.forEach(dayKey => {
+        const daySchedule = schedule.find(s => s.day === dayKey);
+        if (daySchedule) {
+            daySchedule.closed = false;
+            daySchedule.ranges = [{ open: openTime, close: closeTime }];
+        }
+    });
+
+    return schedule;
+}
+
+function parseHoursField(hoursData) {
+    if (Array.isArray(hoursData)) {
+        return hoursData;
+    }
+    if (typeof hoursData === 'object' && hoursData !== null) {
+        return parseHoursFromJson(hoursData);
+    }
+    if (typeof hoursData === 'string') {
+        return parseHoursFromString(hoursData);
+    }
+    return getDefaultSchedule();
+}
+
+function formatHoursToJson(schedule) {
+    const result = {};
+    schedule.forEach(daySchedule => {
+        if (!daySchedule.closed && daySchedule.ranges.length > 0) {
+            result[daySchedule.day] = daySchedule.ranges;
+        }
+    });
+    return Object.keys(result).length > 0 ? result : null;
+}
+
+function formatHoursToString(schedule) {
+    const parts = [];
+
+    schedule.forEach(daySchedule => {
+        if (daySchedule.closed) return;
+
+        const dayLabel = DAY_LABELS_FULL[daySchedule.day];
+        const timeRanges = daySchedule.ranges.map(r => `${r.open}–${r.close}`).join(', ');
+        parts.push(`${dayLabel}: ${timeRanges}`);
+    });
+
+    return parts.length > 0 ? parts.join(' | ') : '';
+}
+
+function getHoursSummary(schedule) {
+    const openDays = schedule.filter(d => !d.closed);
+    const closedDays = schedule.filter(d => d.closed);
+
+    if (openDays.length === 0) {
+        return 'Cerrado';
     }
 
-    return `${dayRange} ${openingTime}–${closingTime}`;
+    if (openDays.length === 7 && closedDays.length === 0) {
+        const firstRange = openDays[0].ranges[0];
+        if (firstRange) {
+            return `Lun–Dom ${firstRange.open}–${firstRange.close}`;
+        }
+    }
+
+    if (openDays.length === 5) {
+        const weekdays = openDays.filter(d => !['saturday', 'sunday'].includes(d.day));
+        const weekends = openDays.filter(d => ['saturday', 'sunday'].includes(d.day));
+
+        if (weekdays.length === 5 && weekends.length === 0) {
+            const firstRange = openDays[0].ranges[0];
+            if (firstRange) {
+                return `Lun–Vie ${firstRange.open}–${firstRange.close}`;
+            }
+        }
+    }
+
+    const firstRange = openDays[0].ranges[0];
+    if (firstRange) {
+        return `${DAY_LABELS_SHORT[openDays[0].day]}–${DAY_LABELS_SHORT[openDays[openDays.length - 1].day]} ${firstRange.open}–${firstRange.close}`;
+    }
+
+    return '';
 }
 
 export function getInitialFormValues(place) {
-    const parsedHours = parseHoursField(place?.hours);
-    
-    const initialImageOrder = place?.images 
+    const schedule = parseHoursField(place?.hours);
+
+    const initialImageOrder = place?.images
         ? place.images.map((img, idx) => ({
             id: Number(img.id),
             sort_order: img.sort_order ?? idx
-          }))
+        }))
         : [];
 
     return {
@@ -108,17 +185,15 @@ export function getInitialFormValues(place) {
         description:   place?.description   ?? '',
         address:       place?.address       ?? '',
         phone:         place?.phone         ?? '',
-        opening_days: parsedHours.opening_days,
-        opening_time: parsedHours.opening_time,
-        closing_time: parsedHours.closing_time,
-        category_id:  place?.category_id  ?? '',
+        schedule:      schedule,
+        category_id:   place?.category_id  ?? '',
         images:        [],
         deleted_image_ids: [],
         image_order: initialImageOrder,
     };
 }
 
-export { DAYS_OF_WEEK };
+export { DAYS_OF_WEEK, DAY_LABELS_FULL, DAY_LABELS_SHORT, getDefaultSchedule, formatHoursToJson, formatHoursToString, getHoursSummary };
 
 /**
  * Devuelve la función de envío del formulario (submit handler).
@@ -135,9 +210,9 @@ export function buildSubmitHandler({ place, put, post, transform, onClose }) {
         e.preventDefault();
 
         const payloadWithoutEmptyImages = (formData) => {
-            const { opening_days, opening_time, closing_time, images, image_order, ...rest } = formData;
+            const { schedule, images, image_order, ...rest } = formData;
 
-            const hours = formatHoursField(opening_days, opening_time, closing_time);
+            const hours = formatHoursToJson(schedule);
 
             const finalPayload = {
                 ...rest,
@@ -204,3 +279,19 @@ export const PLACE_FORM_FIELDS = [
     { key: 'phone',       label: 'Teléfono',           type: 'text',     colSpan: 'half' },
     { key: 'hours',       label: 'Horario',            type: 'text',     colSpan: 'full', placeholder: 'Ej: Lun–Vie 09:00–20:00' },
 ];
+
+/**
+ * Formatea los horarios para mostrar en el frontend de usuario
+ */
+export function formatHoursForDisplay(hoursData) {
+    const schedule = parseHoursField(hoursData);
+    return formatHoursToString(schedule);
+}
+
+/**
+ * Obtiene un resumen corto de horarios para tarjetas
+ */
+export function getHoursShortSummary(hoursData) {
+    const schedule = parseHoursField(hoursData);
+    return getHoursSummary(schedule);
+}

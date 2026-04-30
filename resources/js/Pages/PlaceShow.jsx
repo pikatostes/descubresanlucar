@@ -1,9 +1,9 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
-import Navbar from '../Components/Navbar';
-import Footer from '../Components/Footer';
+import MainLayout from '../Layouts/MainLayout';
 import { getCategoryColor } from '@/utils/filterUtils';
 import { useLike } from '@/hooks/useLike';
+import HoursDisplay, { getHoursShortSummary } from '@/utils/hoursUtils.jsx';
 
 export default function PlaceShow({ auth, place }) {
     const bgColor = getCategoryColor(place.category);
@@ -35,12 +35,10 @@ export default function PlaceShow({ auth, place }) {
     };
 
     return (
-        <>
+        <MainLayout>
             <Head title={`${place.name}`} />
 
             <div className="page-root">
-                <Navbar auth={auth} />
-
                 <main className="place-show">
 
                     {/* ── HERO ── */}
@@ -68,7 +66,7 @@ export default function PlaceShow({ auth, place }) {
 
                             <div className="place-hero__meta">
                                 {place.address && <span>📍 {place.address}</span>}
-                                {place.hours && <span>🕐 {place.hours}</span>}
+                                {place.hours && <span>🕐 {getHoursShortSummary(place.hours)}</span>}
                             </div>
 
                             {place.rating != null && (
@@ -205,10 +203,7 @@ export default function PlaceShow({ auth, place }) {
                                     </div>
                                 )}
                                 {place.hours && (
-                                    <div className="place-infocard__row">
-                                        <span className="info-icon">🕐</span>
-                                        <span>{place.hours}</span>
-                                    </div>
+                                    <HoursDisplay hours={place.hours} showFull={true} />
                                 )}
                                 {place.phone && (
                                     <div className="place-infocard__row">
@@ -252,45 +247,7 @@ export default function PlaceShow({ auth, place }) {
                     </div>
                 </main>
 
-                <Footer
-                    sections={[
-                        {
-                            title: 'Explorar',
-                            links: [
-                                { label: 'Todos los lugares', href: '/' },
-                                { label: 'Mapa interactivo', href: '/mapa' },
-                                { label: 'Destacados', href: '/destacados' },
-                            ],
-                        },
-                        {
-                            title: 'Categorías',
-                            links: [
-                                { label: 'Restaurantes', href: '/categoria/restaurantes' },
-                                { label: 'Bares', href: '/categoria/bares' },
-                                { label: 'Hoteles', href: '/categoria/hoteles' },
-                            ],
-                        },
-                        {
-                            title: 'Propietarios',
-                            links: [
-                                { label: 'Registrar negocio', href: '/register' },
-                                { label: 'Panel de control', href: '/dashboard' },
-                                { label: 'Cómo funciona', href: '/como-funciona' },
-                            ],
-                        },
-                        {
-                            title: 'Legal',
-                            links: [
-                                { label: 'Privacidad', href: '/privacidad' },
-                                { label: 'Términos de uso', href: '/terminos' },
-                                { label: 'Aviso Legal', href: '/aviso-legal' },
-                                { label: 'Planes y Tarifas', href: '/precios' },
-                                { label: 'Contacto', href: '/contacto' },
-                            ],
-                        },
-                    ]}
-                />
             </div>
-        </>
+        </MainLayout>
     );
 }

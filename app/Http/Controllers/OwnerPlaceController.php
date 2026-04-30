@@ -22,14 +22,14 @@ class OwnerPlaceController extends Controller
             'description' => 'nullable|string|max:2000',
             'address' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:30',
-            'hours' => 'nullable|string|max:255',
+            'hours' => 'nullable|array',
             'category_id' => 'nullable|exists:categories,id',
             'tags' => 'nullable|array',
             'tags.*' => ['integer', Rule::exists('tags', 'id')->where(
                 fn ($query) => $query->where('category_id', $request->input('category_id'))
             )],
             'images' => 'required|array|min:1',
-            'images.*' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'images.*' => 'required|image|mimes:jpg,jpeg,png,webp|mimetypes:image/jpeg,image/png,image/webp|max:2048',
         ]);
 
         DB::transaction(function () use ($request, $validated): void {
@@ -52,14 +52,14 @@ class OwnerPlaceController extends Controller
             'description' => 'nullable|string|max:2000',
             'address' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:30',
-            'hours' => 'nullable|string|max:255',
+            'hours' => 'nullable|array',
             'category_id' => 'nullable|exists:categories,id',
             'tags' => 'nullable|array',
             'tags.*' => ['integer', Rule::exists('tags', 'id')->where(
                 fn ($query) => $query->where('category_id', $request->input('category_id'))
             )],
             'images' => 'nullable|array',
-            'images.*' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'images.*' => 'required|image|mimes:jpg,jpeg,png,webp|mimetypes:image/jpeg,image/png,image/webp|max:2048',
             'deleted_image_ids' => 'nullable|array',
             'deleted_image_ids.*' => [
                 'integer',

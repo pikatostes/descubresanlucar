@@ -16,6 +16,12 @@ class Places extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $casts = [
+        'hours' => 'array',
+        'latitude' => 'float',
+        'longitude' => 'float',
+    ];
+
     protected $fillable = [
         'category_id',
         'name',
