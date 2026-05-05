@@ -1,7 +1,5 @@
 import { Head } from '@inertiajs/react';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import Navbar from '../Components/Navbar';
-import Footer from '../Components/Footer';
 import PlaceCard from '../Components/PlaceCard';
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyAP-pYLeiSe1kZulYR16WvNHlNswMtR5zc';
@@ -215,7 +213,6 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
             <Head title="Mapa" />
 
             <div className="page-root">
-                <Navbar auth={auth} />
 
                 <main className="map-page">
                     <div className="map-container">
@@ -369,8 +366,6 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
                         </div>
                     </div>
                 </main>
-
-                <Footer sections={[]} />
             </div>
 
             <style>{`

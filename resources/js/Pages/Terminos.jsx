@@ -1,9 +1,8 @@
 import { Head, Link } from '@inertiajs/react';
-import MainLayout from '../Layouts/MainLayout';
 
 export default function Terminos({ auth }) {
     return (
-        <MainLayout>
+        <>
             <Head title="Términos de Uso" />
 
             <div className="page-root">
@@ -114,6 +113,6 @@ export default function Terminos({ auth }) {
                     </div>
                 </main>
             </div>
-        </MainLayout>
+        </>
     );
 }

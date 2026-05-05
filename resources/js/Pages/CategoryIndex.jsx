@@ -1,6 +1,4 @@
 import { Head, Link } from '@inertiajs/react';
-import Navbar from '../Components/Navbar';
-import Footer from '../Components/Footer';
 
 export default function CategoryIndex({ auth, categories = [] }) {
     return (
@@ -8,7 +6,6 @@ export default function CategoryIndex({ auth, categories = [] }) {
             <Head title="Categorías" />
 
             <div className="page-root">
-                <Navbar auth={auth} />
 
                 <main className="categories-page">
                     <div className="container">
@@ -46,29 +43,6 @@ export default function CategoryIndex({ auth, categories = [] }) {
                         )}
                     </div>
                 </main>
-
-                <Footer
-                    sections={[
-                        {
-                            title: 'Explorar',
-                            links: [
-                                { label: 'Todos los lugares', href: '/' },
-                                { label: 'Categorías', href: '/categorias' },
-                                { label: 'Destacados', href: '/destacados' },
-                            ],
-                        },
-{
-                            title: 'Legal',
-                            links: [
-                                { label: 'Privacidad', href: '/privacidad' },
-                                { label: 'Términos de uso', href: '/terminos' },
-                                { label: 'Aviso Legal', href: '/aviso-legal' },
-                                { label: 'Planes y Tarifas', href: '/precios' },
-                                { label: 'Contacto', href: '/contacto' },
-                            ],
-                        },
-                    ]}
-                />
             </div>
         </>
     );

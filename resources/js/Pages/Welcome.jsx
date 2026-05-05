@@ -1,6 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import Navbar from '../Components/Navbar';
 import HeroSection from '../Components/HeroSection';
 import CategoryMenu from '../Components/CategoryMenu';
 import FilterBar from '../Components/FilterBar';
@@ -86,10 +85,7 @@ export default function Welcome({ auth, places = [], categories = [] }) {
                 Saltar al contenido principal
             </a>
 
-            <div className="page-root">
-                <Navbar auth={auth} />
-
-                <main id="main-content">
+            <main id="main-content">
                     {/* ═══ HERO ═══ */}
                     <HeroSection
                         searchValue={search}
@@ -336,7 +332,6 @@ export default function Welcome({ auth, places = [], categories = [] }) {
                     {/* ═══ OWNER CTA ═══ */}
                     <OwnerCTA />
                 </main>
-            </div>
         </>
     );
 }

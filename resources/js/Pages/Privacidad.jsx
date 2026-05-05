@@ -1,9 +1,8 @@
 import { Head, Link } from '@inertiajs/react';
-import MainLayout from '../Layouts/MainLayout';
 
 export default function Privacidad({ auth }) {
     return (
-        <MainLayout>
+        <>
             <Head title="Política de Privacidad" />
 
             <div className="page-root">
@@ -104,6 +103,6 @@ export default function Privacidad({ auth }) {
                     </div>
                 </main>
             </div>
-        </MainLayout>
+        </>
     );
 }

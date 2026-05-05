@@ -1,35 +1,11 @@
 import { Head, Link } from '@inertiajs/react';
-import Navbar from '../Components/Navbar';
-import Footer from '../Components/Footer';
 
 export default function Contacto({ auth }) {
-    const footerSections = [
-        {
-            title: 'Explorar',
-            links: [
-                { label: 'Todos los lugares', href: '/' },
-                { label: 'Categorías', href: '/categorias' },
-                { label: 'Explorar', href: '/explorar' },
-            ],
-        },
-        {
-            title: 'Legal',
-            links: [
-                { label: 'Privacidad', href: '/privacidad' },
-                { label: 'Términos de uso', href: '/terminos' },
-                { label: 'Aviso Legal', href: '/aviso-legal' },
-                { label: 'Planes y Tarifas', href: '/precios' },
-                { label: 'Contacto', href: '/contacto' },
-            ],
-        },
-    ];
-
     return (
         <>
             <Head title="Contacto" />
 
             <div className="page-root">
-                <Navbar auth={auth} />
 
                 <main className="legal-page">
                     <div className="legal-inner">
@@ -128,8 +104,6 @@ export default function Contacto({ auth }) {
                         </div>
                     </div>
                 </main>
-
-                <Footer sections={footerSections} />
             </div>
         </>
     );

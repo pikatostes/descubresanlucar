@@ -2,12 +2,19 @@ import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import { usePage } from '@inertiajs/react';
 
-export default function MainLayout({ children }) {
+export default function MainLayout({ header, children }) {
     const { auth } = usePage().props;
 
     return (
         <>
             <Navbar auth={auth} />
+            {header && (
+                <header className="bg-white shadow-sm">
+                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                        {header}
+                    </div>
+                </header>
+            )}
             <main>{children}</main>
             <Footer
                 sections={[
