@@ -1,6 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
-import MainLayout from '../Layouts/MainLayout';
 import { getCategoryColor } from '@/utils/filterUtils';
 import { useLike } from '@/hooks/useLike';
 import HoursDisplay, { getHoursShortSummary } from '@/utils/hoursUtils.jsx';
@@ -35,10 +34,10 @@ export default function PlaceShow({ auth, place }) {
     };
 
     return (
-        <MainLayout>
+        <>
             <Head title={`${place.name}`} />
 
-            <div className="page-root">
+            <>
                 <main className="place-show">
 
                     {/* ── HERO ── */}
@@ -247,7 +246,7 @@ export default function PlaceShow({ auth, place }) {
                     </div>
                 </main>
 
-            </div>
-        </MainLayout>
+            </>
+        </>
     );
 }

@@ -52,7 +52,6 @@ export default function Footer({ sections = [] }) {
                     <Link href="/contacto" className="footer-bottom-link">Contacto</Link>
                 </div>
             </div>
-            this is a test
         </footer>
     );
 }

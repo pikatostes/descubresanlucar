@@ -1,5 +1,4 @@
 import { Head, Link } from '@inertiajs/react';
-import MainLayout from '../Layouts/MainLayout';
 
 export default function Pricing({ auth }) {
     const plans = [
@@ -54,7 +53,7 @@ export default function Pricing({ auth }) {
     ];
 
     return (
-        <MainLayout>
+        <>
             <Head title="Planes y Tarifas - DescubreSanlúcar" />
 
             <div className="page-root">
@@ -108,6 +107,6 @@ export default function Pricing({ auth }) {
                     </div>
                 </main>
             </div>
-        </MainLayout>
+        </>
     );
 }

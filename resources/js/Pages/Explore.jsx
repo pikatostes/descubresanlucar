@@ -1,7 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState, useEffect, useMemo, useRef } from 'react';
-import Navbar from '../Components/Navbar';
-import Footer from '../Components/Footer';
 import PlaceCard from '../Components/PlaceCard';
 import ExploreSearchBar from '../Components/ExploreSearchBar';
 
@@ -226,7 +224,6 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
             <Head title="DescubreSanlúcar — Explorar" />
 
             <div className="page-root">
-                <Navbar auth={auth} />
 
                 <main className="explore-page">
                     <div className="container">
@@ -381,29 +378,6 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
                         </div>
                     </div>
                 </main>
-
-                <Footer
-                    sections={[
-                        {
-                            title: 'Explorar',
-                            links: [
-                                { label: 'Todos los lugares', href: '/' },
-                                { label: 'Categorías', href: '/categorias' },
-                                { label: 'Explorar', href: '/explorar' },
-                            ],
-                        },
-                        {
-                            title: 'Legal',
-                            links: [
-                                { label: 'Privacidad', href: '/privacidad' },
-                                { label: 'Términos de uso', href: '/terminos' },
-                                { label: 'Aviso Legal', href: '/aviso-legal' },
-                                { label: 'Planes y Tarifas', href: '/precios' },
-                                { label: 'Contacto', href: '/contacto' },
-                            ],
-                        },
-                    ]}
-                />
             </div>
         </>
     );
