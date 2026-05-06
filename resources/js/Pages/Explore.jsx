@@ -221,7 +221,7 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
 
     return (
         <>
-            <Head title="DescubreSanlúcar — Explorar" />
+            <Head title="Explorar" />
 
             <div className="page-root">
 
