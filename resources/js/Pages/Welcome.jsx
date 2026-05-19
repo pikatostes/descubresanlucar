@@ -74,7 +74,7 @@ export default function Welcome({ auth, places = [], categories = [] }) {
                         description: 'Guía de lugares de interés en Sanlúcar de Barrameda',
                         potentialAction: {
                             '@type': 'SearchAction',
-                            target: '/explorar?q={search_term_string}',
+                            target: '/explorar?search={search_term_string}',
                             'query-input': 'required name=search_term_string',
                         },
                     })}
@@ -106,7 +106,7 @@ export default function Welcome({ auth, places = [], categories = [] }) {
                                     {categories.slice(0, 12).map((cat) => (
                                         <Link
                                             key={cat.slug}
-                                            href={`/explorar?categoria=${cat.slug}`}
+                                            href={`/explorar/${cat.slug}`}
                                             className="category-card"
                                         >
                                             <span className="category-card__icon">{cat.icon}</span>

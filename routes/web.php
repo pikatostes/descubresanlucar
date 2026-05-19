@@ -27,7 +27,7 @@ Route::get('/lugares/{place:slug}', [PlaceController::class, 'show'])->name('pla
 
 Route::get('/categorias', [CategoryController::class, 'index'])->name('categories.index');
 
-Route::get('/explorar', [ExploreController::class, 'index'])->name('explore.index');
+Route::get('/explorar/{category?}', [ExploreController::class, 'index'])->name('explore.index');
 
 Route::get('/mapa', [MapController::class, 'index'])->name('map.index');
 
