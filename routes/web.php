@@ -23,7 +23,7 @@ Route::get('/aviso-legal', fn () => Inertia::render('AvisoLegal'))->name('aviso-
 Route::get('/contacto', fn () => Inertia::render('Contacto'))->name('contacto');
 Route::get('/precios', fn () => Inertia::render('Pricing'))->name('pricing');
 
-Route::get('/lugares/{place:slug}', [PlaceController::class, 'show'])->name('places.show');
+Route::get('/lugares/{category}/{place:slug}', [PlaceController::class, 'show'])->name('places.show');
 
 Route::get('/categorias', [CategoryController::class, 'index'])->name('categories.index');
 

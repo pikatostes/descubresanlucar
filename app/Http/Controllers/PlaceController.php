@@ -8,8 +8,12 @@ use Inertia\Inertia;
 
 class PlaceController extends Controller
 {
-    public function show(Places $place)
+    public function show(string $category, Places $place)
     {
+        if ($place->category?->slug !== $category) {
+            abort(404);
+        }
+
         $place->load(['category', 'tags', 'images', 'primaryImage']);
         $place->loadCount('likes');
         $userId = Auth::id();
