@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import '../../css/Pricing.css';
 
 export default function Pricing({ auth }) {
     const plans = [
