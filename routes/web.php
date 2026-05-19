@@ -23,8 +23,6 @@ Route::get('/aviso-legal', fn () => Inertia::render('AvisoLegal'))->name('aviso-
 Route::get('/contacto', fn () => Inertia::render('Contacto'))->name('contacto');
 Route::get('/precios', fn () => Inertia::render('Pricing'))->name('pricing');
 
-Route::get('/lugares/{category}/{place:slug}', [PlaceController::class, 'show'])->name('places.show');
-
 Route::get('/categorias', [CategoryController::class, 'index'])->name('categories.index');
 
 Route::get('/explorar/{category?}', [ExploreController::class, 'index'])->name('explore.index');
@@ -58,5 +56,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/bank-data/{bankData}', [BankDataController::class, 'update'])->name('bank-data.update');
     Route::delete('/bank-data/{bankData}', [BankDataController::class, 'destroy'])->name('bank-data.destroy');
 });
+
+// Ruta de lugar con categoría (debe ir al final para no interferir con rutas fijas)
+Route::get('/{category}/{place:slug}', [PlaceController::class, 'show'])->name('places.show');
 
 require __DIR__.'/auth.php';

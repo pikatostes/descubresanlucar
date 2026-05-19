@@ -345,7 +345,7 @@ export default function Mapa({ auth, places = [], categories = [], userLocation 
                                             )}
                                             <div className="place-card-actions">
                                                 <a
-                                                    href={`/lugares/${selectedPlace.category?.slug}/${selectedPlace.slug}`}
+                                                    href={`/${selectedPlace.category?.slug}/${selectedPlace.slug}`}
                                                     className="place-card-btn place-card-btn-primary"
                                                 >
                                                     Ver página
