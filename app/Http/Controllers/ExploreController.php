@@ -11,21 +11,13 @@ use Inertia\Inertia;
 
 class ExploreController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, ?string $category = null)
     {
-        $categorySlug = $request->query('categoria');
-        $legacyCategoryId = $request->query('category');
         $search = trim((string) $request->query('search', ''));
         $userId = Auth::id();
 
         $categories = Category::with('tags')->orderBy('label')->get();
-        $selectedCategory = null;
-
-        if ($categorySlug) {
-            $selectedCategory = $categories->firstWhere('slug', $categorySlug);
-        } elseif ($legacyCategoryId) {
-            $selectedCategory = $categories->firstWhere('id', (int) $legacyCategoryId);
-        }
+        $selectedCategory = $categories->firstWhere('slug', $category);
 
         $placesQuery = Places::with('category', 'tags', 'images', 'primaryImage')
             ->withCount('likes');

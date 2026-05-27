@@ -164,10 +164,6 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
         const currentSearch = searchText.trim();
         const currentCategory = categories.find((category) => Number(category.id) === Number(activeCategory));
 
-        if (currentCategory?.slug) {
-            params.set('categoria', currentCategory.slug);
-        }
-
         if (activeTag) {
             params.set('tag', activeTag);
         }
@@ -176,8 +172,9 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
             params.set('search', currentSearch);
         }
 
+        const categoryPath = currentCategory?.slug ? `/${currentCategory.slug}` : '';
         const query = params.toString();
-        const nextUrl = query ? `/explorar?${query}` : '/explorar';
+        const nextUrl = query ? `/explorar${categoryPath}?${query}` : `/explorar${categoryPath}`;
         window.history.replaceState({}, '', nextUrl);
     }, [activeCategory, activeTag, categories, searchText]);
 
@@ -221,7 +218,7 @@ export default function Explore({ auth, categories = [], places = [], selectedCa
 
     return (
         <>
-            <Head title="DescubreSanlúcar — Explorar" />
+            <Head title="Explorar" />
 
             <div className="page-root">
 
